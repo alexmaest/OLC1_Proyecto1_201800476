@@ -1,0 +1,64 @@
+package proyecto_0103;
+
+import java_cup.runtime.Symbol;
+
+parser code
+{:
+    private Symbol s;
+    
+    public void syntax_error(Symbol s){
+        this.s = s;
+    }
+
+    public Symbol getS(){
+        return this.s;
+    }
+    
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{
+    System.out.println("Error sintáctico irrecuperable en la linea " + (s.left) + " Columna " + s.right + 
+    ", Componente " + s.value + " no reconocido");
+    }
+:};
+terminal Conj, Llave_a, Llave_c, P_coma, D_puntos, Separador, Flecha,
+Cadena, Id, Letra, Numero, C_signo, G_ondulado, Coma, Punto, Or, Asterisco, Mas, Interrogacion,
+Comilla_simple, Comilla_doble, Coment_s, Coment_m, Espacio, Cadena_Ll, ERROR;
+non terminal INICIO, INSTRUCCIONES, INSTRUCCION, SENTENCIAS, SENTENCIA, CONJUNTOS, LISTA_LETRAS,
+LISTA_NUMEROS, REGEX;
+non terminal ArrayList<Instrucciones> INSTRUCCIONES;
+
+
+start with INICIO;
+
+INICIO ::= Llave_a INSTRUCCIONES Separador SENTENCIAS Llave_c
+;
+INSTRUCCIONES ::= INSTRUCCIONES INSTRUCCION
+| INSTRUCCION 
+;
+INSTRUCCION ::= Conj D_puntos Id Flecha CONJUNTOS P_coma
+|  Id Flecha REGEX P_coma
+;
+CONJUNTOS ::= Letra G_ondulado Letra 
+| Numero G_ondulado Numero
+| C_signo
+| LISTA_LETRAS
+| LISTA_NUMEROS
+;
+LISTA_LETRAS ::= LISTA_LETRAS Coma Letra
+| Letra
+;
+LISTA_NUMEROS ::= LISTA_NUMEROS Coma Numero
+| Numero
+;
+REGEX::= Mas REGEX
+| Interrogacion REGEX
+| Or REGEX REGEX
+| Punto REGEX REGEX
+| Asterisco REGEX
+| Cadena
+| Cadena_Ll
+;
+SENTENCIAS ::= SENTENCIAS SENTENCIA 
+| SENTENCIA
+;
+SENTENCIA ::= Id D_puntos Cadena P_coma
+;
