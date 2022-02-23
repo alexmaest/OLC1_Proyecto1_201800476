@@ -1,13 +1,17 @@
 package proyecto_0103;
 
 import java_cup.runtime.Symbol;
-
+import java.util.ArrayList;
 parser code
 {:
     private Symbol s;
-    
+    public String error = "";
+    public static ArrayList<Integer> hojas = new ArrayList<Integer>();
+    public int hoja = 1;
+
     public void syntax_error(Symbol s){
-        this.s = s;
+        error += "Advertencia : Error sintáctico con \"" + s.value + 
+        "\" en la fila " + (s.right + 1) + " y columna " + (s.left + 1) + "\n";
     }
 
     public Symbol getS(){
@@ -15,50 +19,294 @@ parser code
     }
     
     public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{
-    System.out.println("Error sintáctico irrecuperable en la linea " + (s.left) + " Columna " + s.right + 
-    ", Componente " + s.value + " no reconocido");
+    error += "Advertencia : Error sintáctico irrecuperable con \"" + s.value + 
+    "\" en la fila " + (s.right + 1) + " y columna " + (s.left + 1) + "\n";
+    }
+
+    public String getSyntaxError() {
+        return this.error;
     }
 :};
-terminal Conj, Llave_a, Llave_c, P_coma, D_puntos, Separador, Flecha,
-Cadena, Id, Letra, Numero, C_signo, G_ondulado, Coma, Punto, Or, Asterisco, Mas, Interrogacion,
-Comilla_simple, Comilla_doble, Coment_s, Coment_m, Espacio, Cadena_Ll, ERROR;
-non terminal INICIO, INSTRUCCIONES, INSTRUCCION, SENTENCIAS, SENTENCIA, CONJUNTOS, LISTA_LETRAS,
-LISTA_NUMEROS, REGEX;
+terminal String Id;
+terminal String Cadena;
+terminal String Letra;
+terminal String Numero;
+terminal String C_signo;
+terminal String Punto;
+terminal String Or;
+terminal String Asterisco;
+terminal String Interrogacion;
+terminal String Mas;
+terminal String Cadena_Ll;
+terminal String G_ondulado;
+terminal String Coma;
+terminal String Conj;
+terminal String Llave_a;
+terminal String Llave_c;
+terminal String P_coma;
+terminal String D_puntos;
+terminal String Separador;
+terminal String Flecha;
+terminal String Comilla_simple;
+terminal String Comilla_doble;
+terminal String Coment_s;
+terminal String Coment_m;
+terminal String Espacio;
+terminal ERROR;
+
+non terminal INICIO;
 non terminal ArrayList<Instrucciones> INSTRUCCIONES;
+non terminal Instrucciones INSTRUCCION;
+non terminal ArrayList<Sentencia> SENTENCIAS;
+non terminal Sentencia SENTENCIA;
+non terminal ArrayList<Expresion> CONJUNTOS;
+non terminal ArrayList<Expresion> REGEXS;
+non terminal Expresion REGEX;
+non terminal ArrayList<String> TWOREGEX;
+non terminal ArrayList<String> AUXREGEX;
+non terminal ArrayList<Expresion> LISTA_LETRAS;
+non terminal ArrayList<Expresion> LISTA_NUMEROS;
 
 
 start with INICIO;
 
-INICIO ::= Llave_a INSTRUCCIONES Separador SENTENCIAS Llave_c
+INICIO ::= Llave_a INSTRUCCIONES:listI Separador SENTENCIAS:listS Llave_c
+{:
+    Analyzers.instrucciones = (ArrayList<Instrucciones>)listI;
+    Analyzers.sentencias = (ArrayList<Sentencia>)listS;
+:}
 ;
-INSTRUCCIONES ::= INSTRUCCIONES INSTRUCCION
-| INSTRUCCION 
+INSTRUCCIONES ::= INSTRUCCIONES:pluralI INSTRUCCION:singleI
+{:
+    ArrayList<Instrucciones> lista = pluralI;
+    lista.add((Instrucciones)singleI);
+    RESULT = lista;
+:}
+| INSTRUCCION:singleI
+{:
+    ArrayList<Instrucciones> lista = new ArrayList<Instrucciones>();
+    lista.add((Instrucciones)singleI);
+    RESULT = lista;
+:}
 ;
-INSTRUCCION ::= Conj D_puntos Id Flecha CONJUNTOS P_coma
-|  Id Flecha REGEX P_coma
+INSTRUCCION ::= Conj D_puntos Id:id Flecha CONJUNTOS:con P_coma
+{:
+    Instrucciones i = new Instrucciones(id,(ArrayList<Expresion>)con,Instruccion.CONJUNTO);
+    RESULT = i;
+:}
+|  Id:id Flecha REGEXS:reg P_coma
+{:
+    hojas.add(hoja);
+    hoja = 1;
+    Instrucciones i = new Instrucciones(id,(ArrayList<Expresion>)reg,Instruccion.REGEX);
+    RESULT = i;
+:}
 ;
-CONJUNTOS ::= Letra G_ondulado Letra 
-| Numero G_ondulado Numero
-| C_signo
-| LISTA_LETRAS
-| LISTA_NUMEROS
+CONJUNTOS ::= Letra:r1 G_ondulado:r2 Letra:r3
+{:
+    ArrayList<Expresion> lista = new ArrayList<Expresion>();
+    ArrayList<String> listaStrings = new ArrayList<String>();
+
+    listaStrings.add(r1);
+    listaStrings.add(r2);
+    listaStrings.add(r3);
+
+    lista.add(new Expresion(listaStrings));
+    RESULT = lista;
+:}
+| Numero:r1 G_ondulado:r2 Numero:r3
+{:
+    ArrayList<Expresion> lista = new ArrayList<Expresion>();
+    ArrayList<String> listaStrings = new ArrayList<String>();
+
+    listaStrings.add(r1);
+    listaStrings.add(r2);
+    listaStrings.add(r3);
+
+    lista.add(new Expresion(listaStrings));
+    RESULT = lista;
+:}
+| C_signo:r
+{:
+    ArrayList<Expresion> lista = new ArrayList<Expresion>();
+    ArrayList<String> listaStrings = new ArrayList<String>();
+
+    listaStrings.add(r);
+
+    lista.add(new Expresion(listaStrings));
+    RESULT = lista;
+:}
+| LISTA_LETRAS:r
+{:
+    RESULT = r;
+:}
+| LISTA_NUMEROS:r
+{:
+    RESULT = r;
+:}
 ;
-LISTA_LETRAS ::= LISTA_LETRAS Coma Letra
-| Letra
+LISTA_LETRAS ::= LISTA_LETRAS:r1 Coma:r2 Letra:r3
+{:
+    ArrayList<Expresion> lista = r1;
+    ArrayList<String> listaStrings = new ArrayList<String>();
+
+    listaStrings.add(r2);
+    listaStrings.add(r3);
+
+    lista.add(new Expresion(listaStrings));
+    RESULT = lista;
+:}
+| Letra:r
+{:
+    ArrayList<Expresion> lista = new ArrayList<Expresion>();
+    ArrayList<String> listaStrings = new ArrayList<String>();
+
+    listaStrings.add(r);
+
+    lista.add(new Expresion(listaStrings));
+    RESULT = lista;
+:}
 ;
-LISTA_NUMEROS ::= LISTA_NUMEROS Coma Numero
-| Numero
+LISTA_NUMEROS ::= LISTA_NUMEROS:r1 Coma:r2 Numero:r3
+{:
+    ArrayList<Expresion> lista = r1;
+    ArrayList<String> listaStrings = new ArrayList<String>();
+
+    listaStrings.add(r2);
+    listaStrings.add(r3);
+
+    lista.add(new Expresion(listaStrings));
+    RESULT = lista;
+:}
+| Numero:r
+{:
+    ArrayList<Expresion> lista = new ArrayList<Expresion>();
+    ArrayList<String> listaStrings = new ArrayList<String>();
+
+    listaStrings.add(r);
+
+    lista.add(new Expresion(listaStrings));
+    RESULT = lista;
+:}
 ;
-REGEX::= Mas REGEX
-| Interrogacion REGEX
-| Or REGEX REGEX
-| Punto REGEX REGEX
-| Asterisco REGEX
-| Cadena
-| Cadena_Ll
+
+REGEXS ::= REGEXS:pluralR REGEX:singleR
+{:
+    ArrayList<Expresion> lista = pluralR;
+    lista.add((Expresion)singleR);
+    RESULT = lista;
+:}
+| REGEX:singleR
+{:
+    ArrayList<Expresion> lista = new ArrayList<Expresion>();
+    lista.add((Expresion)singleR);
+    RESULT = lista;
+:}
 ;
-SENTENCIAS ::= SENTENCIAS SENTENCIA 
-| SENTENCIA
+
+REGEX ::= Mas:r REGEX:r2 
+{:
+    ArrayList<String> lista = new ArrayList<String>();
+    lista.add(r);
+    for (int i = 0; i < r2.getListaInst().size(); i++) {
+       lista.add(r2.getListaInst().get(i));
+    }
+    Expresion e = new Expresion(lista);
+    RESULT = e;
+:}
+| Interrogacion:r REGEX:r2
+{:
+    ArrayList<String> lista = new ArrayList<String>();
+    lista.add(r);
+    for (int i = 0; i < r2.getListaInst().size(); i++) {
+       lista.add(r2.getListaInst().get(i));
+    }
+    Expresion e = new Expresion(lista);
+    RESULT = e;
+:}
+| Or:r TWOREGEX:r2
+{:
+    ArrayList<String> lista = new ArrayList<String>();
+    lista.add(r);
+    for (int i = 0; i < r2.size(); i++) {
+       lista.add(r2.get(i));
+    }
+    Expresion e = new Expresion(lista);
+    RESULT = e;
+:}
+| Punto:r TWOREGEX:r2
+{:
+    ArrayList<String> lista = new ArrayList<String>();
+    lista.add(r);
+    for (int i = 0; i < r2.size(); i++) {
+       lista.add(r2.get(i));
+    }
+    Expresion e = new Expresion(lista);
+    RESULT = e;
+:}
+| Asterisco:r REGEX:r2
+{:
+    ArrayList<String> lista = new ArrayList<String>();
+    lista.add(r);
+    for (int i = 0; i < r2.getListaInst().size(); i++) {
+       lista.add(r2.getListaInst().get(i));
+    }
+    Expresion e = new Expresion(lista);
+    RESULT = e;
+:}
+| Cadena:r
+{:
+    ArrayList<String> lista = new ArrayList<String>();
+    lista.add(r);
+    Expresion x = new Expresion(lista);
+    RESULT = x;
+    hoja+=1;
+:}
+| Cadena_Ll:r
+{:
+    ArrayList<String> lista = new ArrayList<String>();
+    lista.add(r);
+    Expresion x = new Expresion(lista);
+    RESULT = x;
+    hoja+=1;
+:}
 ;
-SENTENCIA ::= Id D_puntos Cadena P_coma
+TWOREGEX ::= AUXREGEX:r1 AUXREGEX:r2
+{:
+    ArrayList<String> lista = new ArrayList<String>();
+    for (int i = 0; i < r1.size(); i++) {
+       lista.add(r1.get(i));
+    }
+    for (int i = 0; i < r2.size(); i++) {
+       lista.add(r2.get(i));
+    }
+    RESULT = lista;
+:}
+;
+AUXREGEX ::= REGEX:r2
+{:
+    ArrayList<String> lista = new ArrayList<String>();
+    for (int i = 0; i < r2.getListaInst().size(); i++) {
+       lista.add(r2.getListaInst().get(i));
+    }
+    RESULT = lista;
+:}
+;
+SENTENCIAS ::= SENTENCIAS:pluralS SENTENCIA:singleS 
+{:
+    pluralS.add((Sentencia)singleS);
+    RESULT = pluralS;
+:}
+| SENTENCIA:singleS 
+{:
+    ArrayList<Sentencia> lista = new ArrayList<Sentencia>();
+    lista.add((Sentencia)singleS);
+    RESULT = lista;
+:}
+;
+SENTENCIA ::= Id:idSen D_puntos Cadena:C P_coma 
+{:
+    Sentencia s = new Sentencia(idSen, C);
+    RESULT = s;
+:}
 ;

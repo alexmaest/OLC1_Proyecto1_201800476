@@ -2,7 +2,11 @@ package proyecto_0103;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
-import java_cup.runtime.Symbol;
+import java.util.ArrayList;
+import proyecto_0103.Instrucciones;
+import proyecto_0103.Lexer;
+import proyecto_0103.Sentencia;
+import proyecto_0103.Syntax;
 
 /**
  *
@@ -11,6 +15,9 @@ import java_cup.runtime.Symbol;
 public class Analyzers {
 
     String error = "";
+    public static ArrayList<String> arrayReg;
+    public static ArrayList<Instrucciones> instrucciones;
+    public static ArrayList<Sentencia> sentencias;
 
     public Analyzers() {
     }
@@ -28,6 +35,34 @@ public class Analyzers {
 
             if ("".equals(lexicError) && "".equals(syntaxError)) {
                 System.out.println("Analisis finalizado mi pai");
+                System.out.println("\n");
+                System.out.println("----------- SENTENCIAS -----------");
+                for (int i = 0; i < sentencias.size(); i++) {
+                    System.out.println(sentencias.get(i).getId() + ", " + sentencias.get(i).getCadena());
+                }
+
+                System.out.println("----------- INSTRUCCIONES -----------");
+                System.out.println(instrucciones.size());
+                arrayReg = new ArrayList<String>();
+                for (int i = 0; i < instrucciones.size(); i++) {
+                    switch (instrucciones.get(i).getTipo()) {
+                        case REGEX:
+                            System.out.println("***********************************");
+                            System.out.println(instrucciones.get(i).getId());
+                            for (int j = 0; j < instrucciones.get(i).getCadena().size(); j++) {
+                                String singleRegex = "";
+                                for (int k = 0; k < instrucciones.get(i).getCadena().get(j).getListaInst().size(); k++) {
+                                    singleRegex += instrucciones.get(i).getCadena().get(j).getListaInst().get(k);
+                                    System.out.print(instrucciones.get(i).getCadena().get(j).getListaInst().get(k));
+                                }
+                                System.out.println("");
+                                arrayReg.add(singleRegex);
+                            }
+                    }
+                }
+
+                //Validate v = new Validate();
+                //v.validations();
                 return true;
             } else {
                 if (!"".equals(lexicError)) {
@@ -41,6 +76,39 @@ public class Analyzers {
         } catch (Exception ex) {
             return false;
         }
+    }
+
+    public boolean getAutomata(String text) {
+        Lexer2 l = null;
+        Automata a = null;
+        try {
+            l = new Lexer2(new BufferedReader(new StringReader(text)));
+            a = new Automata(l);
+            a.parse();
+
+            System.out.println("Analisis de automata finalizado");
+            System.out.println("\n");
+            return true;
+        } catch (Exception ex) {
+            System.out.println(ex);
+            return false;
+        }
+    }
+
+    public static ArrayList<Instrucciones> getInstrucciones() {
+        return instrucciones;
+    }
+
+    public static void setInstrucciones(ArrayList<Instrucciones> instrucciones) {
+        Analyzers.instrucciones = instrucciones;
+    }
+
+    public static ArrayList<Sentencia> getSentencias() {
+        return sentencias;
+    }
+
+    public static void setSentencias(ArrayList<Sentencia> sentencias) {
+        Analyzers.sentencias = sentencias;
     }
 
     public String Error() {

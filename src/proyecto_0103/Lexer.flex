@@ -8,7 +8,7 @@ import java_cup.runtime.Symbol;
 %line
 %char
 
-Cadena = [\'\"][^\'\"\n]*[\'\"]
+Cadena = [\'\"](\\\"|\\\'|\\\n|[^\"\'\n])*[\'\"]
 Cadena_Ll = [{][^{}\'\"\n]*[}]
 Letra = [A-Za-zÑñ]
 Numero = [0-9]
@@ -19,11 +19,17 @@ Coment_m = \<\![^!><]*\!\>
 Coment_s = (\/{2})+[^\/\n]*
 Espacio = [\s\t\r\f\n]+
 %{
+    public String error = "";
+
     private Symbol symbol(int type, Object value){
         return new Symbol(type, yyline, yycolumn, value);
     }
     private Symbol symbol(int type){
         return new Symbol(type, yyline, yycolumn);
+    }
+
+    public String getLexicError() {
+        return this.error;
     }
 %}
 %%
@@ -78,5 +84,5 @@ return new Symbol(sym.Letra, yychar, yyline, yytext());}
 return new Symbol(sym.C_signo, yychar, yyline, yytext());}
 
 . {
-    System.out.println("Advertencia : Error léxico con \"" + yytext() + "\" en la fila " + yyline + " y columna: " + yycolumn + "\n");
+    this.error += "Advertencia : Error léxico con \"" + yytext() + "\" en la fila " + yyline + " y columna: " + yycolumn + "\n";
 }
