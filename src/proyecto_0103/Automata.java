@@ -134,8 +134,6 @@ public class Automata extends java_cup.runtime.lr_parser {
     public static ArrayList<String> GraphText = new ArrayList<String>();
     public static ArrayList<Siguiente> nexts = new ArrayList<Siguiente>();
     public int actualHoja = 0;
-    public int counter = Syntax.hojas.get(0);
-
 
     public int mas = 1;
     public int interrogacion = 1;
@@ -240,23 +238,24 @@ class CUP$Automata$actions {
 		int singleRright = ((java_cup.runtime.Symbol)CUP$Automata$stack.peek()).right;
 		Node singleR = (Node)((java_cup.runtime.Symbol) CUP$Automata$stack.peek()).value;
 		
-    nexts.add(new Siguiente(primero.first,Integer.toString(counter)));
+    actualHoja +=1;
+    nexts.add(new Siguiente(primero.first,Integer.toString(actualHoja)));
     GraphVariables.add(new GraphNode("HASH [style=filled color=lightblue label=<<table border=\"0\">"
-                        +"<tr><td bgcolor=\"black\"><font color=\"white\">"+counter+"</font></td><td cellpadding=\"10\">#</td><td bgcolor=\"white\">"+counter+"</td></tr>"
-                        +"<tr><td></td><td bgcolor=\"#84ff82\">"+counter+"</td><td></td></tr></table>>];",counter,"#"));
+                        +"<tr><td bgcolor=\"black\"><font color=\"white\">"+actualHoja+"</font></td><td cellpadding=\"10\">#</td><td bgcolor=\"white\">"+actualHoja+"</td></tr>"
+                        +"<tr><td></td><td bgcolor=\"#84ff82\">"+actualHoja+"</td><td></td></tr></table>>];",actualHoja,"#"));
     GraphText.add("P0 -> {"+primero.name+",HASH};\n");
     String first = null;
     String last = null;
     if (primero.anulable==true){
-        first = Integer.toString(counter);
-        last = primero.last + Integer.toString(counter);
+        first = Integer.toString(actualHoja);
+        last = primero.last + Integer.toString(actualHoja);
         GraphVariables.add(new GraphNode("P0 [style=filled color=lightblue label=<<table border=\"0\">"
             +"<tr><td bgcolor=\"black\"><font color=\"white\">"+last+"</font></td><td cellpadding=\"10\">.</td><td bgcolor=\"white\">"+first+"</td></tr>"
             +"</table>>];\n",0,"."));
         Node h = new Node(last,".",first,"",false,0);
         head = h;
     }else{
-        first = Integer.toString(counter);
+        first = Integer.toString(actualHoja);
         last = primero.last;
         GraphVariables.add(new GraphNode("P0[style=filled color=lightblue label=<<table border=\"0\">"
             +"<tr><td bgcolor=\"black\"><font color=\"white\">"+last+"</font></td><td cellpadding=\"10\">.</td><td bgcolor=\"white\">"+first+"</td></tr>"

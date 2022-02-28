@@ -1,5 +1,7 @@
 package proyecto_0103;
 
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -11,10 +13,11 @@ import java.util.ArrayList;
  */
 public class AutomataGenerator {
 
+    public static ArrayList<jsonData> jsonElements = new ArrayList<jsonData>();
     ArrayList<InsideTableNode> siguientes;
     ArrayList<TransNode> GeneralStates;
 
-    public String generateTree() {
+    public void generateTree(String id) {
         String gText = "digraph G {";
         ArrayList<GraphNode> variables = Automata.GraphVariables;
         ArrayList<String> conexiones = Automata.GraphText;
@@ -67,7 +70,7 @@ public class AutomataGenerator {
         for (int i = 0; i < conexiones.size(); i++) {
             gText += conexiones.get(i);
         }
-
+        gText += "label = \"" + id + "\";";
         gText += "types [\n"
                 + "   shape=plaintext\n"
                 + "   label=<\n"
@@ -80,11 +83,19 @@ public class AutomataGenerator {
                 + "     </table>>\n"
                 + "  ];\n"
                 + "}";
-        imageGenerator(gText,"");
-        return gText;
+        imageGenerator(gText, id, 1);
     }
 
-    public void generateNextTable() {
+    public void generateNextTable(String id) {
+        String gText = "digraph {\n"
+                + "  node [ shape=none fontname=Helvetica ]\n"
+                + "  n [ label = <\n"
+                + "    <table bgcolor=\"black\">"
+                + "<tr>\n"
+                + "         <td bgcolor=\"#ccccff\">No.</td>\n"
+                + "         <td bgcolor=\"#ccccff\">Valor</td>\n"
+                + "         <td bgcolor=\"#ccccff\">Siguientes</td>\n"
+                + "       </tr>";
         siguientes = new ArrayList<InsideTableNode>();
         ArrayList<GraphNode> variables = Automata.GraphVariables;
         ArrayList<Siguiente> nextT = Automata.nexts;
@@ -121,11 +132,23 @@ public class AutomataGenerator {
                                 already = true;
                             }
                         }
+                        String gs = "";
                         if (already == false) {
                             for (int l = 0; l < nexts.length; l++) {
-                                aux.add(nexts[l]);
+                                if (l + 1 == nexts.length) {
+                                    aux.add(nexts[l]);
+                                    gs += nexts[l];
+                                } else {
+                                    aux.add(nexts[l]);
+                                    gs += nexts[l] + ", ";
+                                }
                             }
                             siguientes.add(new InsideTableNode(variables.get(j).name, variables.get(j).indexS, aux));
+                            gText += "<tr>\n"
+                                    + "         <td bgcolor=\"#ccffcc\">" + variables.get(j).indexS + "</td>\n"
+                                    + "         <td bgcolor=\"#ffffcc\">" + variables.get(j).name + "</td>\n"
+                                    + "         <td bgcolor=\"#ffcccc\">" + gs + "</td>\n"
+                                    + "      </tr>";
                         }
                     }
                 }
@@ -135,11 +158,16 @@ public class AutomataGenerator {
         for (int i = 0; i < variables.size(); i++) {
             if ("#".equals(variables.get(i).name)) {
                 siguientes.add(new InsideTableNode(variables.get(i).name, variables.get(i).indexS, null));
+                gText += "<tr>\n"
+                        + "         <td bgcolor=\"#ccffcc\">" + variables.get(i).indexS + "</td>\n"
+                        + "         <td bgcolor=\"#ffffcc\">" + variables.get(i).name + "</td>\n"
+                        + "         <td bgcolor=\"#ffcccc\">---</td>\n"
+                        + "      </tr>";
             }
         }
 
         //imprimir tabla de siguientes
-        System.out.println("SIZE: " + siguientes.size());
+        /*System.out.println("SIZE: " + siguientes.size());
         for (int i = 0; i < siguientes.size(); i++) {
             System.out.println(siguientes.get(i).name + " " + siguientes.get(i).indexI);
             if (siguientes.get(i).nexts != null) {
@@ -147,10 +175,24 @@ public class AutomataGenerator {
                     System.out.println(siguientes.get(i).nexts.get(j));
                 }
             }
-        }
+        }*/
+        gText += "</table>\n"
+                + "  > ]\n"
+                + "label = \"" + id + "\";"
+                + "}";
+        imageGenerator(gText, id, 2);
     }
 
-    public void generateTransitionTable() {
+    public void generateTransitionTable(String id) {
+        String gText = "digraph {\n"
+                + "  node [ shape=none fontname=Helvetica ]\n"
+                + "  n [ label = <\n"
+                + "    <table bgcolor=\"black\">";
+        String gText2 = "digraph finite_state_machine {\n"
+                + "	fontname=\"Helvetica,Arial,sans-serif\"\n"
+                + "	node [fontname=\"Helvetica,Arial,sans-serif\"]\n"
+                + "	edge [fontname=\"Helvetica,Arial,sans-serif\"]\n"
+                + "	rankdir=LR;";
         Node head = Automata.head;
         String[] primeros = head.last.split(",");
 
@@ -329,24 +371,92 @@ public class AutomataGenerator {
                 i--;
             }
         }
-
+        gText += "<tr>\n"
+                + "<td bgcolor=\"#ccccff\" rowspan=\"2\">Estados</td>\n"
+                + "<td bgcolor=\"#ccccff\" colspan=\"" + GeneralStates.get(0).transitions.size() + "\">Transiciones</td>\n"
+                + "</tr>";
+        for (int i = 0; i < GeneralStates.size(); i++) {
+            gText += "<tr>\n";
+            for (int j = 0; j < GeneralStates.get(i).transitions.size(); j++) {
+                gText += "<td bgcolor=\"#ffcccc\">" + GeneralStates.get(i).transitions.get(j).name + "</td>\n";
+            }
+            gText += "</tr>";
+            break;
+        }
         //Imprimir tabla de transiciones
         for (int i = 0; i < GeneralStates.size(); i++) {
-            System.out.println("Estado S" + GeneralStates.get(i).id);
-            System.out.println("-------------Números-------------");
+            //System.out.println("Estado S" + GeneralStates.get(i).id);
+            //System.out.println("-------------Números-------------");
+            gText += "<tr>"
+                    + "<td bgcolor=\"#ccffcc\">S" + GeneralStates.get(i).id + " {";
             for (int j = 0; j < GeneralStates.get(i).numbers.size(); j++) {
-                System.out.print(GeneralStates.get(i).numbers.get(j).number + " " + GeneralStates.get(i).numbers.get(j).scanned);
+                if (j + 1 == GeneralStates.get(i).numbers.size()) {
+                    gText += GeneralStates.get(i).numbers.get(j).number;
+                    //System.out.print(GeneralStates.get(i).numbers.get(j).number + " " + GeneralStates.get(i).numbers.get(j).scanned);
+                    break;
+                }
+                gText += GeneralStates.get(i).numbers.get(j).number + ",";
+                //System.out.print(GeneralStates.get(i).numbers.get(j).number + " " + GeneralStates.get(i).numbers.get(j).scanned);
             }
-            System.out.println("\n");
-            System.out.println("-------------Headers-------------");
+            gText += "}</td>";
+            //System.out.println("\n");
+            //System.out.println("-------------Headers-------------");
             for (int j = 0; j < GeneralStates.get(i).transitions.size(); j++) {
-                System.out.println(GeneralStates.get(i).transitions.get(j).name + " -> " + GeneralStates.get(i).transitions.get(j).where);
+                //System.out.println(GeneralStates.get(i).transitions.get(j).name + " -> " + GeneralStates.get(i).transitions.get(j).where);
+                if (GeneralStates.get(i).transitions.get(j).where == 0) {
+                    gText += "<td bgcolor=\"#ffffcc\"> --- </td>";
+                } else {
+                    gText += "<td bgcolor=\"#ffffcc\">S" + GeneralStates.get(i).transitions.get(j).where + "</td>";
+                }
             }
-            System.out.println("---------------------------------");
+            //System.out.println("---------------------------------");
+            gText += "</tr>";
         }
+        String aStates = "";
+        for (int i = 0; i < GeneralStates.size(); i++) {
+            for (int j = 0; j < GeneralStates.get(i).numbers.size(); j++) {
+                if ("#".equals(GeneralStates.get(i).numbers.get(j).name)) {
+                    if (j + 1 == GeneralStates.get(i).numbers.size()) {
+                        aStates += "S" + GeneralStates.get(i).id;
+                    } else {
+                        aStates += "S" + GeneralStates.get(i).id + ", ";
+                    }
+                }
+            }
+        }
+        gText2 += "node [shape = doublecircle color=darkgreen]; " + aStates + ";\n";
+        gText2 += "node [shape = circle color=blue];\n";
+        for (int i = 0; i < GeneralStates.size(); i++) {
+            for (int j = 0; j < GeneralStates.get(i).transitions.size(); j++) {
+                if (GeneralStates.get(i).transitions.get(j).where == 0) {
+                } else {
+                    String[] tempS = GeneralStates.get(i).transitions.get(j).name.split("");
+                    if ("\"".equals(tempS[0]) || "\'".equals(tempS[0])) {
+                        String[] s2 = removeTheElement(tempS, 0);
+                        String[] s3 = removeTheElement(s2, s2.length - 1);
+                        String x = "";
+                        for (int w = 0; w < s3.length; w++) {
+                            x += s3[w];
+                        }
+                        gText2 += "S" + GeneralStates.get(i).id + " -> S" + GeneralStates.get(i).transitions.get(j).where + " [label = \"\\\"" + x + "\\\"\"];\n";
+                    } else {
+                        gText2 += "S" + GeneralStates.get(i).id + " -> S" + GeneralStates.get(i).transitions.get(j).where + " [label = \"" + GeneralStates.get(i).transitions.get(j).name + "\"];\n";
+                    }
+                }
+            }
+        }
+
+        gText += "</table>\n"
+                + "  > ]\n"
+                + "label = \"" + id + "\";"
+                + "}";
+        gText2 += "label = \"" + id + "\";\n"
+                + "}";
+        imageGenerator(gText, id, 3);
+        imageGenerator(gText2, id, 4);
     }
 
-    public void generateAutomata(String text) {
+    public void generateAutomata(String text, String id) {
         //ArrayList<Sentencia> sen = Analyzers.sentencias;
         //ArrayList<Instrucciones> ins = Analyzers.instrucciones;
         //System.out.println("-----------CONJUNTOS-----------");
@@ -371,7 +481,7 @@ public class AutomataGenerator {
         int currentState = 1;
         boolean Error = false;
         for (int i = 0; i < lexema.length; i++) {
-            System.out.println("Se encuentra en el estado " + currentState);
+            //System.out.println("Se encuentra en el estado " + currentState);
             String temp = lexema[i];
             int lexCont = 0;
             if ("\\".equals(temp)) {
@@ -396,7 +506,7 @@ public class AutomataGenerator {
                     if (t.length >= 2) {
                         if (transitionConversor(GeneralStates.get(currentState - 1).transitions.get(j).name, temp)) {
                             if (GeneralStates.get(currentState - 1).transitions.get(j).where != 0) {
-                                System.out.println("Entrada: " + temp + " aceptada");
+                                //System.out.println("Entrada: " + temp + " aceptada");
                                 Accepted = true;
                                 currentState = GeneralStates.get(currentState - 1).transitions.get(j).where;
                                 i += lexCont + 2;
@@ -409,7 +519,7 @@ public class AutomataGenerator {
                         if (transitionConversor(GeneralStates.get(currentState - 1).transitions.get(j).name, temp)) {
                             if (GeneralStates.get(currentState - 1).transitions.get(j).where != 0) {
                                 Accepted = true;
-                                System.out.println("Caracter: " + temp + " aceptado");
+                                //System.out.println("Caracter: " + temp + " aceptado");
                                 currentState = GeneralStates.get(currentState - 1).transitions.get(j).where;
                                 break;
                             } else {
@@ -419,7 +529,7 @@ public class AutomataGenerator {
                     }
                 }
                 if (Accepted == false) {
-                    System.out.println("Caracter: " + temp + " denegado");
+                    //System.out.println("Caracter: " + temp + " denegado");
                     Error = true;
                     break;
                 }
@@ -432,7 +542,7 @@ public class AutomataGenerator {
                             if (t.length >= 2) {
                                 if (transitionConversor(GeneralStates.get(currentState - 1).transitions.get(k).name, temp)) {
                                     if (GeneralStates.get(currentState - 1).transitions.get(j).where != 0) {
-                                        System.out.println("Entrada: " + temp + " aceptada");
+                                        //System.out.println("Entrada: " + temp + " aceptada");
                                         Accepted = true;
                                         currentState = GeneralStates.get(currentState - 1).transitions.get(j).where;
                                         i += lexCont + 2;
@@ -445,7 +555,7 @@ public class AutomataGenerator {
                                 if (transitionConversor(GeneralStates.get(currentState - 1).transitions.get(k).name, temp)) {
                                     if (GeneralStates.get(currentState - 1).transitions.get(j).where != 0) {
                                         Accepted = true;
-                                        System.out.println("Caracter: " + temp + " aceptado");
+                                        //System.out.println("Caracter: " + temp + " aceptado");
                                         currentState = GeneralStates.get(currentState - 1).transitions.get(j).where;
                                         break;
                                     } else {
@@ -455,7 +565,7 @@ public class AutomataGenerator {
                             }
                         }
                         if (Accepted == false) {
-                            System.out.println("Caracter: " + temp + " denegado");
+                            //System.out.println("Caracter: " + temp + " denegado");
                             Error = true;
                             break;
                         }
@@ -468,8 +578,10 @@ public class AutomataGenerator {
         }
         if (Error) {
             System.out.println("Lexema no aceptado por la Expresión regular");
+            jsonElements.add(new jsonData(text, id, false));
         } else {
             System.out.println("Lexema aceptado por la Expresión regular");
+            jsonElements.add(new jsonData(text, id, true));
         }
     }
 
@@ -567,7 +679,7 @@ public class AutomataGenerator {
         return false;
     }
 
-    public String[] removeTheElement(String[] arr, int index) {
+    public static String[] removeTheElement(String[] arr, int index) {
         if (arr == null || index < 0
                 || index >= arr.length) {
             return arr;
@@ -582,23 +694,58 @@ public class AutomataGenerator {
         return anotherArray;
     }
 
-    public static void imageGenerator(String text, String name) {
-        createFile(text, name);
+    public static void imageGenerator(String text, String name, int type) {
+        createFile(text, name, type);
         ProcessBuilder process = null;
-        process = new ProcessBuilder("dot", "-Tpng", "-o", name + ".png", name + ".dot");
+        if (type == 1) {
+            process = new ProcessBuilder("dot", "-Tpng", "-o", "Reportes/ARBOLES_201800476/" + name + ".png", "Reportes/ARBOLES_201800476/" + name + ".dot");
+        } else if (type == 2) {
+            process = new ProcessBuilder("dot", "-Tpng", "-o", "Reportes/SIGUIENTES_201800476/" + name + ".png", "Reportes/SIGUIENTES_201800476/" + name + ".dot");
+        } else if (type == 3) {
+            process = new ProcessBuilder("dot", "-Tpng", "-o", "Reportes/TRANSICIONES_201800476/" + name + ".png", "Reportes/TRANSICIONES_201800476/" + name + ".dot");
+        } else if (type == 4) {
+            process = new ProcessBuilder("dot", "-Tpng", "-o", "Reportes/AFD_201800476/" + name + ".png", "Reportes/AFD_201800476/" + name + ".dot");
+        }
         process.redirectErrorStream(true);
         try {
             process.start();
+            System.out.println("Archivo generado");
         } catch (IOException ex) {
             System.out.println(ex);
         }
     }
 
-    public static void createFile(String text, String name) {
+    public static void createFile(String text, String name, int type) {
         FileWriter f = null;
         PrintWriter textG = null;
         try {
-            String cType = name + ".dot";
+            String cType = "";
+            File directory;
+            if (type == 1) {
+                cType = "Reportes/ARBOLES_201800476/" + name + ".dot";
+                directory = new File("Reportes/ARBOLES_201800476/");
+                if (!directory.exists()) {
+                    directory.mkdir();
+                }
+            } else if (type == 2) {
+                cType = "Reportes/SIGUIENTES_201800476/" + name + ".dot";
+                directory = new File("Reportes/SIGUIENTES_201800476/");
+                if (!directory.exists()) {
+                    directory.mkdir();
+                }
+            } else if (type == 3) {
+                cType = "Reportes/TRANSICIONES_201800476/" + name + ".dot";
+                directory = new File("Reportes/TRANSICIONES_201800476/");
+                if (!directory.exists()) {
+                    directory.mkdir();
+                }
+            } else if (type == 4) {
+                cType = "Reportes/AFD_201800476/" + name + ".dot";
+                directory = new File("Reportes/AFD_201800476/");
+                if (!directory.exists()) {
+                    directory.mkdir();
+                }
+            }
             f = new FileWriter(cType);
             textG = new PrintWriter(f);
             textG.write(text);
@@ -615,5 +762,132 @@ public class AutomataGenerator {
                 }
             }
         }
+    }
+
+    public static void failsReport() throws IOException {
+        ArrayList<Fail> fails = Analyzers.errores;
+        String fText = "";
+        fText += "<!DOCTYPE html>\n"
+                + "            <html lang=\"en\">\n"
+                + "\n"
+                + "            <head>\n"
+                + "\n"
+                + "                <meta charset=\"utf-8\">\n"
+                + "                <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, shrink-to-fit=no\">\n"
+                + "                <meta name=\"description\" content=\"\">\n"
+                + "                <meta name=\"author\" content=\"TemplateMo\">\n"
+                + "                <link href=\"https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700\" rel=\"stylesheet\">\n"
+                + "\n"
+                + "                <title>Reporte</title>\n"
+                + "\n"
+                + "                <!-- Bootstrap core CSS -->\n"
+                + "                <link href=\"vendor/bootstrap/css/bootstrap.min.css\" rel=\"stylesheet\">\n"
+                + "\n"
+                + "                <!-- Additional CSS Files -->\n"
+                + "                <link rel=\"stylesheet\" href=\"assets/css/fontawesome.css\">\n"
+                + "                <link rel=\"stylesheet\" href=\"assets/css/templatemo-host-cloud.css\">\n"
+                + "                <link rel=\"stylesheet\" href=\"assets/css/owl.css\">\n"
+                + "            <!--\n"
+                + "\n"
+                + "            Host Cloud Template\n"
+                + "\n"
+                + "            https://templatemo.com/tm-541-host-cloud\n"
+                + "\n"
+                + "            -->\n"
+                + "            </head>\n"
+                + "\n"
+                + "            <body>\n"
+                + "        <!-- Header -->\n"
+                + "        <header class=\"\">\n"
+                + "        <nav class=\"navbar navbar-expand-lg\">\n"
+                + "            <div class=\"container\">\n"
+                + "            <a class=\"navbar-brand\" href=\"reporte_Errores.html\"><h2>Reportes<em>OLC1</em></h2></a>\n"
+                + "            <button class=\"navbar-toggler\" type=\"button\" data-toggle=\"collapse\" data-target=\"#navbarResponsive\" aria-controls=\"navbarResponsive\" aria-expanded=\"false\" aria-label=\"Toggle navigation\">\n"
+                + "                <span class=\"navbar-toggler-icon\"></span>\n"
+                + "            </button>\n"
+                + "            <div class=\"collapse navbar-collapse\" id=\"navbarResponsive\">\n"
+                + "                <ul class=\"navbar-nav ml-auto\">\n"
+                + "                </ul>\n"
+                + "            </div>\n"
+                + "            <div class=\"functional-buttons\">\n"
+                + "            </div>\n"
+                + "            </div>\n"
+                + "        </nav>\n"
+                + "        </header>\n"
+                + "\n"
+                + "        <!-- Page Content -->\n"
+                + "        <!-- Banner Starts Here -->\n"
+                + "        <div class=\"banner\">\n"
+                + "        <div class=\"container\">\n"
+                + "            <div class=\"row\">\n"
+                + "            <div class=\"col-md-8 offset-md-2\">\n"
+                + "                <div class=\"header-text caption\">\n"
+                + "                <h2 style=>Reporte de</h2>\n"
+                + "                <h1 style=\"color: white; font-size:120px; text-align: center; font-style: italic; font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; text-transform:uppercase\">Errores</h1>\n"
+                + "                </div>\n"
+                + "            </div>\n"
+                + "            </div>\n"
+                + "        </div>\n"
+                + "        </div>"
+                + "<div style=\"padding-bottom: 100px;\" class=\"services-section\">\n"
+                + "                <div class=\"container\">\n"
+                + "                    <div class=\"row\">\n"
+                + "                        <div class=\"col-md-8 offset-md-2\">\n"
+                + "                            <div class=\"section-heading\">\n"
+                + "                            <h2 style=\"text-transform:uppercase; text-align: center;\">Tokens</h2>\n"
+                + "                            </div>\n"
+                + "                            <table class=\"table\">\n"
+                + "                            <thead style=\"color:white; background-color: rgb(0, 50, 199); text-transform:uppercase; text-align: center;\">\n"
+                + "                                <tr>"
+                + "<th scope=\"col\">No.</th>"
+                + "<th scope=\"col\">Tipo</th>"
+                + "<th scope=\"col\">Descripción</th>"
+                + "<th scope=\"col\">Linea</th>"
+                + "<th scope=\"col\">Columna</th>"
+                + "</tr>"
+                + "</thead>"
+                + "<tbody>";
+        for (int i = 0; i < fails.size(); i++) {
+            fText += "<tr>"
+                    + "<td style=\"text-align: center;\">" + (i + 1) + "</td>"
+                    + "<td style=\"text-align: center;\">" + fails.get(i).type + "</td>"
+                    + "<td style=\"text-align: center;\">" + fails.get(i).message + "</td>"
+                    + "<td style=\"text-align: center;\">" + fails.get(i).line + "</td>"
+                    + "<td style=\"text-align: center;\">" + fails.get(i).column + "</td>"
+                    + "</tr>";
+        }
+        fText += "</tbody>\n"
+                + "                        </table>\n"
+                + "                        </div>\n"
+                + "                    </div>\n"
+                + "                    </div>\n"
+                + "                </div>\n"
+                + "                </div>"
+                + "<script src=\"vendor/jquery/jquery.min.js\"></script>\n"
+                + "                <script src=\"vendor/bootstrap/js/bootstrap.bundle.min.js\"></script>\n"
+                + "\n"
+                + "                <!-- Additional Scripts -->\n"
+                + "                <script src=\"assets/js/custom.js\"></script>\n"
+                + "                <script src=\"assets/js/owl.js\"></script>\n"
+                + "                <script src=\"assets/js/accordions.js\"></script>\n"
+                + "\n"
+                + "\n"
+                + "                <script language = \"text/Javascript\"> \n"
+                + "                cleared[0] = cleared[1] = cleared[2] = 0; //set a cleared flag for each field\n"
+                + "                function clearField(t){                   //declaring the array outside of the\n"
+                + "                if(! cleared[t.id]){                      // function makes it static and global\n"
+                + "                    cleared[t.id] = 1;  // you could use true and false, but that's more typing\n"
+                + "                    t.value='';         // with more chance of typos\n"
+                + "                    t.style.color='#fff';\n"
+                + "                    }\n"
+                + "                }\n"
+                + "                </script>\n"
+                + "            </body>\n"
+                + "            </html>";
+
+        File f = new File("Reportes/REPORTES_SALIDA/reporte_Errores.html");
+        BufferedWriter bw = new BufferedWriter(new FileWriter(f));
+        bw.write(fText);
+        bw.close();
     }
 }

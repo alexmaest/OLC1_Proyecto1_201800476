@@ -324,6 +324,8 @@ class Lexer implements java_cup.runtime.Scanner {
    * @param   in  the java.io.Reader to read input from.
    */
   Lexer(java.io.Reader in) {
+      yyline = 1; 
+    yycolumn = 1; 
     this.zzReader = in;
   }
 
@@ -701,6 +703,7 @@ class Lexer implements java_cup.runtime.Scanner {
         switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
           case 1: 
             { this.error += "Advertencia : Error léxico con \"" + yytext() + "\" en la fila " + yyline + " y columna: " + yycolumn + "\n";
+    Analyzers.errores.add(new Fail(yyline, yycolumn, "Lexico", "Hay un error con el caracter " + yytext(), yytext()));
             } 
             // fall through
           case 25: break;

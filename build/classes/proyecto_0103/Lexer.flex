@@ -18,6 +18,12 @@ C_signo = {Signo}[~]{Signo}
 Coment_m = \<\![^!><]*\!\>
 Coment_s = (\/{2})+[^\/\n]*
 Espacio = [\s\t\r\f\n]+
+
+%init{ 
+    yyline = 1; 
+    yycolumn = 1; 
+%init} 
+
 %{
     public String error = "";
 
@@ -85,4 +91,5 @@ return new Symbol(sym.C_signo, yychar, yyline, yytext());}
 
 . {
     this.error += "Advertencia : Error léxico con \"" + yytext() + "\" en la fila " + yyline + " y columna: " + yycolumn + "\n";
+    Analyzers.errores.add(new Fail(yyline, yycolumn, "Lexico", "Hay un error con el caracter " + yytext(), yytext()));
 }

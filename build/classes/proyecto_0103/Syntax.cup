@@ -12,6 +12,7 @@ parser code
     public void syntax_error(Symbol s){
         error += "Advertencia : Error sintáctico con \"" + s.value + 
         "\" en la fila " + (s.right + 1) + " y columna " + (s.left + 1) + "\n";
+        Analyzers.errores.add(new Fail(s.left, s.right, "Sintáctico", "Hay un error con el caracter " + s.value, s.value.toString()));
     }
 
     public Symbol getS(){
@@ -21,6 +22,7 @@ parser code
     public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{
     error += "Advertencia : Error sintáctico irrecuperable con \"" + s.value + 
     "\" en la fila " + (s.right + 1) + " y columna " + (s.left + 1) + "\n";
+    Analyzers.errores.add(new Fail(s.left, s.right, "Sintáctico", "Hay un error con el caracter " + s.value, s.value.toString()));
     }
 
     public String getSyntaxError() {
@@ -52,9 +54,12 @@ terminal String Comilla_doble;
 terminal String Coment_s;
 terminal String Coment_m;
 terminal String Espacio;
-terminal ERROR;
+
 
 non terminal INICIO;
+non terminal LLA_A;
+non terminal LLA_C;
+non terminal SEP;
 non terminal ArrayList<Instrucciones> INSTRUCCIONES;
 non terminal Instrucciones INSTRUCCION;
 non terminal ArrayList<Sentencia> SENTENCIAS;
@@ -70,11 +75,20 @@ non terminal ArrayList<Expresion> LISTA_NUMEROS;
 
 start with INICIO;
 
-INICIO ::= Llave_a INSTRUCCIONES:listI Separador SENTENCIAS:listS Llave_c
+INICIO ::= LLA_A INSTRUCCIONES:listI SEP SEP SENTENCIAS:listS LLA_C
 {:
     Analyzers.instrucciones = (ArrayList<Instrucciones>)listI;
     Analyzers.sentencias = (ArrayList<Sentencia>)listS;
 :}
+;
+LLA_A ::= Llave_a
+| error P_coma
+;
+LLA_C ::= Llave_c
+| error P_coma
+;
+SEP ::= Separador
+| error P_coma 
 ;
 INSTRUCCIONES ::= INSTRUCCIONES:pluralI INSTRUCCION:singleI
 {:
@@ -88,6 +102,7 @@ INSTRUCCIONES ::= INSTRUCCIONES:pluralI INSTRUCCION:singleI
     lista.add((Instrucciones)singleI);
     RESULT = lista;
 :}
+| error P_coma
 ;
 INSTRUCCION ::= Conj D_puntos Id:id Flecha CONJUNTOS:con P_coma
 {:
@@ -303,6 +318,7 @@ SENTENCIAS ::= SENTENCIAS:pluralS SENTENCIA:singleS
     lista.add((Sentencia)singleS);
     RESULT = lista;
 :}
+| error P_coma
 ;
 SENTENCIA ::= Id:idSen D_puntos Cadena:C P_coma 
 {:

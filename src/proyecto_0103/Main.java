@@ -11,14 +11,14 @@ public class Main {
      */
     public static void main(String[] args) throws Exception {
 
-        String ruta = "src/proyecto_0103/Automatas/";
+        String ruta = "src/proyecto_0103/";
 
         //Analizador Léxico
-        String[] aLexico = {ruta + "Lexer2.flex", "-d", ruta};
+        String[] aLexico = {ruta + "Lexer.flex", "-d", ruta};
         jflex.Main.generate(aLexico);
 
         //Analizador Sintáctico
-        String[] aSintactico = {"-destdir", ruta, "-parser", "Automata", ruta + "Automata.cup"};
+        String[] aSintactico = {"-destdir", ruta, "-parser", "Syntax", ruta + "Syntax.cup"};
         java_cup.Main.main(aSintactico);
     }
 

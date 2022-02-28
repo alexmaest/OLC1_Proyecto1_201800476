@@ -11,7 +11,6 @@ public class sym {
   public static final int Coment_m = 25;
   public static final int Numero = 5;
   public static final int Mas = 11;
-  public static final int ERROR = 27;
   public static final int Comilla_simple = 22;
   public static final int Llave_c = 17;
   public static final int G_ondulado = 13;
@@ -63,8 +62,7 @@ public class sym {
   "Comilla_doble",
   "Coment_s",
   "Coment_m",
-  "Espacio",
-  "ERROR"
+  "Espacio"
   };
 }
 

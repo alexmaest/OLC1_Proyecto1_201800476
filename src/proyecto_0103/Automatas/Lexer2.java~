@@ -623,7 +623,7 @@ class Lexer2 implements java_cup.runtime.Scanner {
       if (zzInput == YYEOF && zzStartRead == zzCurrentPos) {
         zzAtEOF = true;
             zzDoEOF();
-          { return new java_cup.runtime.Symbolsym2m.EOF); }
+          { return new java_cup.runtime.Symbol(sym2.EOF); }
       }
       else {
         switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
@@ -639,25 +639,25 @@ class Lexer2 implements java_cup.runtime.Scanner {
           case 11: break;
           case 3: 
             { System.out.println("Punto = " + yytext());
-return new Symbolsym2m.Punto, yychar, yyline, yytext());
+return new Symbol(sym2.Punto, yychar, yyline, yytext());
             } 
             // fall through
           case 12: break;
           case 4: 
             { System.out.println("Or = " + yytext());
-return new Symbolsym2m.Or, yychar, yyline, yytext());
+return new Symbol(sym2.Or, yychar, yyline, yytext());
             } 
             // fall through
           case 13: break;
           case 5: 
             { System.out.println("Asterico = " + yytext());
-return new Symbolsym2m.Asterisco, yychar, yyline, yytext());
+return new Symbol(sym2.Asterisco, yychar, yyline, yytext());
             } 
             // fall through
           case 14: break;
           case 6: 
             { System.out.println("Mas = " + yytext());
-return new Symbolsym2m.Mas, yychar, yyline, yytext());
+return new Symbol(sym2.Mas, yychar, yyline, yytext());
             } 
             // fall through
           case 15: break;
@@ -669,13 +669,13 @@ return new Symbol(sym2.Interrogacion, yychar, yyline, yytext());
           case 16: break;
           case 8: 
             { System.out.println("Cadena = " + yytext());
-return new Symbolsym2m.Cadena, yychar, yyline, yytext());
+return new Symbol(sym2.Cadena, yychar, yyline, yytext());
             } 
             // fall through
           case 17: break;
           case 9: 
             { System.out.println("Cadena_Ll = " + yytext());
-return new Symbolsym2m.Cadena_Ll, yychar, yyline, yytext());
+return new Symbol(sym2.Cadena_Ll, yychar, yyline, yytext());
             } 
             // fall through
           case 18: break;
