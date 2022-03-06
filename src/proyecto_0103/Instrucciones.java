@@ -1,5 +1,7 @@
 package proyecto_0103;
 
+import proyecto_0103.ExpressionTree.Conjunto;
+import proyecto_0103.ExpressionTree.Expresion;
 import java.util.ArrayList;
 
 /**

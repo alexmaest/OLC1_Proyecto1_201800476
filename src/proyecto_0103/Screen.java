@@ -5,6 +5,12 @@
  */
 package proyecto_0103;
 
+import proyecto_0103.ExpressionTree.AutomataGenerator;
+import proyecto_0103.ExpressionTree.Siguiente;
+import proyecto_0103.ExpressionTree.Automata;
+import proyecto_0103.ExpressionTree.GraphNode;
+import proyecto_0103.ExpressionTree.Node;
+import proyecto_0103.ExpressionTree.InsideTableNode;
 import proyecto_0103.Analyzers;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -28,6 +34,10 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import proyecto_0103.ExpressionTree.Transition;
+import proyecto_0103.ThompsonTree.Automata2;
+import proyecto_0103.ThompsonTree.AutomataGenerator2;
+import proyecto_0103.ThompsonTree.DataText;
 
 /**
  *
@@ -55,7 +65,6 @@ public class Screen extends javax.swing.JFrame {
 
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         TA1 = new javax.swing.JTextArea();
@@ -77,12 +86,16 @@ public class Screen extends javax.swing.JFrame {
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
+        jMenu4 = new javax.swing.JMenu();
+        jMenuItem4 = new javax.swing.JMenuItem();
+        jMenuItem5 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("ExpAnalyzer");
         setBackground(new java.awt.Color(51, 51, 51));
 
         jPanel2.setBackground(new java.awt.Color(0, 0, 51));
@@ -92,15 +105,6 @@ public class Screen extends javax.swing.JFrame {
         jLabel1.setForeground(new java.awt.Color(255, 153, 0));
         jLabel1.setText("ExpAnalyzer");
 
-        jButton2.setBackground(new java.awt.Color(51, 51, 51));
-        jButton2.setForeground(new java.awt.Color(255, 255, 255));
-        jButton2.setText("Generar Automatas");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -108,19 +112,13 @@ public class Screen extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(25, 25, 25)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 700, Short.MAX_VALUE)
-                .addComponent(jButton2)
-                .addGap(23, 23, 23))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jButton2)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -138,7 +136,7 @@ public class Screen extends javax.swing.JFrame {
         TA2.setRows(5);
         jScrollPane2.setViewportView(TA2);
 
-        jButton1.setBackground(new java.awt.Color(255, 0, 0));
+        jButton1.setBackground(new java.awt.Color(255, 102, 0));
         jButton1.setForeground(new java.awt.Color(255, 255, 255));
         jButton1.setText("Analizar");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -250,7 +248,7 @@ public class Screen extends javax.swing.JFrame {
                                 .addGap(18, 18, 18)
                                 .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 982, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(21, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -298,11 +296,34 @@ public class Screen extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu1);
 
+        jMenu4.setForeground(new java.awt.Color(0, 0, 0));
+        jMenu4.setText("Generar");
+
+        jMenuItem4.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_1, java.awt.event.InputEvent.CTRL_MASK));
+        jMenuItem4.setText("Automatas por Arbol de Expresión");
+        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem4ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem4);
+
+        jMenuItem5.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_2, java.awt.event.InputEvent.CTRL_MASK));
+        jMenuItem5.setText("Automatas por Arbol de Thompson");
+        jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem5ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem5);
+
+        jMenuBar1.add(jMenu4);
+
         jMenu2.setForeground(new java.awt.Color(0, 0, 0));
         jMenu2.setText("Exportar");
 
         jMenuItem2.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_J, java.awt.event.InputEvent.CTRL_MASK));
-        jMenuItem2.setText("Generar JSON");
+        jMenuItem2.setText("Generar Json de salidas");
         jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem2ActionPerformed(evt);
@@ -331,8 +352,8 @@ public class Screen extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -360,51 +381,6 @@ public class Screen extends javax.swing.JFrame {
             TA2.setForeground(new Color(255, 0, 0));
         }
     }//GEN-LAST:event_jButton1ActionPerformed
-
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-
-        //Arreglo de regex
-        ArrayList<InsideTableNode> ST = a.arrayReg;
-        //Instancia para todo el proceso de un automata
-        AutomataGenerator g = new AutomataGenerator();
-        boolean analized = false;
-        for (int i = 0; i < ST.size(); i++) {
-            //Reiniciar variables
-            Automata.GraphVariables = new ArrayList<GraphNode>();
-            Automata.GraphText = new ArrayList<String>();
-            Automata.head = new Node("", "", "", "", false, 0);
-            Automata.nexts = new ArrayList<Siguiente>();
-            Automata.primero = new Node("", "", "", "", false, 0);
-            //Analisis regex
-            analized = a.getAutomata(ST.get(i).nexts.get(0));
-            //Arbol
-            g.generateTree(ST.get(i).name);
-            //Tabla de Siguientes
-            g.generateNextTable(ST.get(i).name);
-            //Tabla de Transiciones
-            g.generateTransitionTable(ST.get(i).name);
-            //Automata
-            ArrayList<Sentencia> sen = a.sentencias;
-            for (int j = 0; j < sen.size(); j++) {
-                if (sen.get(j).getId().equals(ST.get(i).name)) {
-                    g.generateAutomata(sen.get(j).getCadena(), ST.get(i).name);
-                }
-            }
-            //Regex analizada correctamente?
-            if (analized == false) {
-                break;
-            }
-        }
-
-        if (analized) {
-            TA2.setText("Analisis de automatas realizado correctamente");
-            TA2.setForeground(new Color(0, 255, 0));
-        } else {
-            TA2.setText("No se ha podido realizar el análisis de los automatas");
-            TA2.setForeground(new Color(255, 0, 0));
-        }
-    }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         // TODO add your handling code here:
@@ -435,11 +411,11 @@ public class Screen extends javax.swing.JFrame {
             array.add(single);
         }
         try {
-            FileWriter f = new FileWriter("Reportes/REPORTES_SALIDA/CadenasValidas.json");
-            File directory = new File("Reportes/REPORTES_SALIDA/CadenasValidas.json");
+            File directory = new File("Reportes/SALIDAS_201800476/");
             if (!directory.exists()) {
                 directory.mkdir();
             }
+            FileWriter f = new FileWriter("Reportes/SALIDAS_201800476/CadenasValidas.json");
             f.write(array.toJSONString());
             f.flush();
             JOptionPane.showMessageDialog(this, "Mensaje: Reporte Json creado");
@@ -484,6 +460,88 @@ public class Screen extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Mensaje: Reporte no ha sido creado");
         }
     }//GEN-LAST:event_jMenuItem3ActionPerformed
+
+    private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+        // TODO add your handling code here:
+        //Arreglo de regex
+        ArrayList<InsideTableNode> ST = a.arrayReg;
+        //Instancia para todo el proceso de un automata
+        AutomataGenerator g = new AutomataGenerator();
+        boolean analized = false;
+        for (int i = 0; i < ST.size(); i++) {
+            //Reiniciar variables
+            Automata.GraphVariables = new ArrayList<GraphNode>();
+            Automata.GraphText = new ArrayList<String>();
+            Automata.head = new Node("", "", "", "", false, 0);
+            Automata.nexts = new ArrayList<Siguiente>();
+            Automata.primero = new Node("", "", "", "", false, 0);
+            //Analisis regex
+            analized = a.getExpressionTree(ST.get(i).nexts.get(0));
+            //Arbol
+            g.generateTree(ST.get(i).name);
+            //Tabla de Siguientes
+            g.generateNextTable(ST.get(i).name);
+            //Tabla de Transiciones
+            g.generateTransitionTable(ST.get(i).name);
+            //Automata
+            ArrayList<Sentencia> sen = a.sentencias;
+            for (int j = 0; j < sen.size(); j++) {
+                if (sen.get(j).getId().equals(ST.get(i).name)) {
+                    g.generateAutomata(sen.get(j).getCadena(), ST.get(i).name);
+                }
+            }
+            //Regex analizada correctamente?
+            if (analized == false) {
+                break;
+            }
+        }
+
+        if (analized) {
+            TA2.setText("Analisis de automatas realizado correctamente");
+            TA2.setForeground(new Color(0, 255, 0));
+        } else {
+            TA2.setText("No se ha podido realizar el análisis de los automatas");
+            TA2.setForeground(new Color(255, 0, 0));
+        }
+    }//GEN-LAST:event_jMenuItem4ActionPerformed
+
+    private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
+        // TODO add your handling code here:
+        //Arreglo de regex
+        ArrayList<InsideTableNode> ST = a.arrayReg;
+        //Instancia para todo el proceso de un automata
+        AutomataGenerator2 g = new AutomataGenerator2();
+        boolean analized = false;
+        for (int i = 0; i < ST.size(); i++) {
+            //Reiniciar variables
+            Automata2.GraphThompson = new ArrayList<DataText>();
+            Automata2.headers = new ArrayList<Transition>();
+            Automata2.nodes = new ArrayList<proyecto_0103.ThompsonTree.Node>();
+            //Analisis regex
+            analized = a.getThompsonTree(ST.get(i).nexts.get(0));
+            //Arbol
+            g.generateTree(ST.get(i).name);
+            //Tabla de transiciones
+            g.graphTransitionTable(ST.get(i).name);
+            //Automata
+            ArrayList<Sentencia> sen = a.sentencias;
+            for (int j = 0; j < sen.size(); j++) {
+                if (sen.get(j).getId().equals(ST.get(i).name)) {
+                    g.generateAutomata(sen.get(j).getCadena(), ST.get(i).name);
+                }
+            }
+            if (analized == false) {
+                break;
+            }
+        }
+        if (analized) {
+            TA2.setText("Analisis de automatas realizado correctamente");
+            TA2.setForeground(new Color(0, 255, 0));
+        } else {
+            TA2.setText("No se ha podido realizar el análisis de los automatas");
+            TA2.setForeground(new Color(255, 0, 0));
+        }
+    }//GEN-LAST:event_jMenuItem5ActionPerformed
     public static DefaultMutableTreeNode root;
     public static DefaultTreeModel model;
 
@@ -568,7 +626,6 @@ public class Screen extends javax.swing.JFrame {
     private javax.swing.JTextArea TA1;
     private javax.swing.JTextArea TA2;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -578,10 +635,13 @@ public class Screen extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenuItem jMenuItem4;
+    private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;

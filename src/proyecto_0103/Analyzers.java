@@ -1,5 +1,10 @@
 package proyecto_0103;
 
+import proyecto_0103.ExpressionTree.Lexer2;
+import proyecto_0103.ExpressionTree.Automata;
+import proyecto_0103.ThompsonTree.Lexer3;
+import proyecto_0103.ExpressionTree.Automata;
+import proyecto_0103.ExpressionTree.InsideTableNode;
 import java.io.BufferedReader;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -7,6 +12,7 @@ import proyecto_0103.Instrucciones;
 import proyecto_0103.Lexer;
 import proyecto_0103.Sentencia;
 import proyecto_0103.Syntax;
+import proyecto_0103.ThompsonTree.Automata2;
 
 /**
  *
@@ -84,7 +90,7 @@ public class Analyzers {
         }
     }
 
-    public boolean getAutomata(String text) {
+    public boolean getExpressionTree(String text) {
         Lexer2 l = null;
         Automata a = null;
         try {
@@ -101,6 +107,23 @@ public class Analyzers {
         }
     }
 
+    public boolean getThompsonTree(String text) {
+        Lexer3 l = null;
+        Automata2 a = null;
+        try {
+            l = new Lexer3(new BufferedReader(new StringReader(text)));
+            a = new Automata2(l);
+            a.parse();
+
+            System.out.println("Analisis de automata finalizado");
+            System.out.println("\n");
+            return true;
+        } catch (Exception ex) {
+            System.out.println(ex);
+            return false;
+        }
+    }
+    
     public static ArrayList<Instrucciones> getInstrucciones() {
         return instrucciones;
     }

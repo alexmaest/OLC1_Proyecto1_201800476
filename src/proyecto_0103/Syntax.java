@@ -5,6 +5,7 @@
 
 package proyecto_0103;
 
+import proyecto_0103.ExpressionTree.Expresion;
 import java_cup.runtime.Symbol;
 import java.util.ArrayList;
 import java_cup.runtime.XMLElement;
