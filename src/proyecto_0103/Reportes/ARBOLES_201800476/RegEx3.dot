@@ -1,0 +1,26 @@
+digraph G {Cll1[style=filled color=lightblue label=<<table border="0"><tr><td bgcolor="black"><font color="white">1</font></td><td cellpadding="10">{digito}</td><td bgcolor="white">1</td></tr><tr><td></td><td bgcolor="#84ff82">1</td><td></td></tr></table>>];
+Cad1[style=filled color=lightblue label=<<table border="0"><tr><td bgcolor="black"><font color="white">2</font></td><td cellpadding="10">"_"</td><td bgcolor="white">2</td></tr><tr><td></td><td bgcolor="#84ff82">2</td><td></td></tr></table>>];
+Cll2[style=filled color=lightblue label=<<table border="0"><tr><td bgcolor="black"><font color="white">3</font></td><td cellpadding="10">{letra}</td><td bgcolor="white">3</td></tr><tr><td></td><td bgcolor="#84ff82">3</td><td></td></tr></table>>];
+Cll3[style=filled color=lightblue label=<<table border="0"><tr><td bgcolor="black"><font color="white">4</font></td><td cellpadding="10">{digito}</td><td bgcolor="white">4</td></tr><tr><td></td><td bgcolor="#84ff82">4</td><td></td></tr></table>>];
+OR1[style=filled color=lightblue label=<<table border="0"><tr><td bgcolor="black"><font color="white">3,4</font></td><td cellpadding="10">|</td><td bgcolor="white">3,4</td></tr></table>>];
+OR2[style=filled color=lightblue label=<<table border="0"><tr><td bgcolor="black"><font color="white">2,3,4</font></td><td cellpadding="10">|</td><td bgcolor="white">2,3,4</td></tr></table>>];
+AS1[style=filled color="#ff8282" label=<<table border="0"><tr><td bgcolor="black"><font color="white">2,3,4</font></td><td cellpadding="10">*</td><td bgcolor="white">2,3,4</td></tr></table>>];
+P1[style=filled color=lightblue label=<<table border="0"><tr><td bgcolor="black"><font color="white">1</font></td><td cellpadding="10">.</td><td bgcolor="white">1,2,3,4</td></tr></table>>];
+HASH [style=filled color=lightblue label=<<table border="0"><tr><td bgcolor="black"><font color="white">5</font></td><td cellpadding="10">#</td><td bgcolor="white">5</td></tr><tr><td></td><td bgcolor="#84ff82">5</td><td></td></tr></table>>];P0[style=filled color=lightblue label=<<table border="0"><tr><td bgcolor="black"><font color="white">1</font></td><td cellpadding="10">.</td><td bgcolor="white">5</td></tr></table>>];
+OR1-> {Cll2,Cll3};
+OR2-> {Cad1,OR1};
+AS1-> {OR2};
+P1-> {Cll1,AS1};
+P0 -> {P1,HASH};
+label = "RegEx3";types [
+   shape=plaintext
+   label=<
+     <table border="0" cellborder="1" cellspacing="0">
+       <tr><td bgcolor="lightblue"><font color="black">No Anulables</font></td></tr>
+       <tr><td bgcolor="#ff8282"><font color="white">Anulables</font></td></tr>
+       <tr><td bgcolor="white"><font>Últimos</font></td></tr>
+       <tr><td bgcolor="black"><font color="white">Primeros</font></td></tr>
+       <tr><td bgcolor="#84ff82"><font>Hojas</font></td></tr>
+     </table>>
+  ];
+}

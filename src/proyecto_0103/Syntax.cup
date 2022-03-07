@@ -2,6 +2,7 @@ package proyecto_0103;
 
 import java_cup.runtime.Symbol;
 import java.util.ArrayList;
+import proyecto_0103.ExpressionTree.Expresion;
 parser code
 {:
     private Symbol s;
@@ -30,9 +31,7 @@ parser code
     }
 :};
 terminal String Id;
-terminal String Cadena;
-terminal String Letra;
-terminal String Numero;
+terminal String Caracter;
 terminal String C_signo;
 terminal String Punto;
 terminal String Or;
@@ -69,13 +68,12 @@ non terminal ArrayList<Expresion> REGEXS;
 non terminal Expresion REGEX;
 non terminal ArrayList<String> TWOREGEX;
 non terminal ArrayList<String> AUXREGEX;
-non terminal ArrayList<Expresion> LISTA_LETRAS;
-non terminal ArrayList<Expresion> LISTA_NUMEROS;
+non terminal ArrayList<Expresion> LISTA_CARACTER;
 
 
 start with INICIO;
 
-INICIO ::= LLA_A INSTRUCCIONES:listI SEP SEP SENTENCIAS:listS LLA_C
+INICIO ::= LLA_A INSTRUCCIONES:listI SEP SENTENCIAS:listS LLA_C
 {:
     Analyzers.instrucciones = (ArrayList<Instrucciones>)listI;
     Analyzers.sentencias = (ArrayList<Sentencia>)listS;
@@ -117,19 +115,7 @@ INSTRUCCION ::= Conj D_puntos Id:id Flecha CONJUNTOS:con P_coma
     RESULT = i;
 :}
 ;
-CONJUNTOS ::= Letra:r1 G_ondulado:r2 Letra:r3
-{:
-    ArrayList<Expresion> lista = new ArrayList<Expresion>();
-    ArrayList<String> listaStrings = new ArrayList<String>();
-
-    listaStrings.add(r1);
-    listaStrings.add(r2);
-    listaStrings.add(r3);
-
-    lista.add(new Expresion(listaStrings));
-    RESULT = lista;
-:}
-| Numero:r1 G_ondulado:r2 Numero:r3
+CONJUNTOS ::= Caracter:r1 G_ondulado:r2 Caracter:r3
 {:
     ArrayList<Expresion> lista = new ArrayList<Expresion>();
     ArrayList<String> listaStrings = new ArrayList<String>();
@@ -151,16 +137,13 @@ CONJUNTOS ::= Letra:r1 G_ondulado:r2 Letra:r3
     lista.add(new Expresion(listaStrings));
     RESULT = lista;
 :}
-| LISTA_LETRAS:r
+| LISTA_CARACTER:r
 {:
     RESULT = r;
 :}
-| LISTA_NUMEROS:r
-{:
-    RESULT = r;
-:}
+| error P_coma
 ;
-LISTA_LETRAS ::= LISTA_LETRAS:r1 Coma:r2 Letra:r3
+LISTA_CARACTER ::= LISTA_CARACTER:r1 Coma:r2 Caracter:r3
 {:
     ArrayList<Expresion> lista = r1;
     ArrayList<String> listaStrings = new ArrayList<String>();
@@ -171,29 +154,7 @@ LISTA_LETRAS ::= LISTA_LETRAS:r1 Coma:r2 Letra:r3
     lista.add(new Expresion(listaStrings));
     RESULT = lista;
 :}
-| Letra:r
-{:
-    ArrayList<Expresion> lista = new ArrayList<Expresion>();
-    ArrayList<String> listaStrings = new ArrayList<String>();
-
-    listaStrings.add(r);
-
-    lista.add(new Expresion(listaStrings));
-    RESULT = lista;
-:}
-;
-LISTA_NUMEROS ::= LISTA_NUMEROS:r1 Coma:r2 Numero:r3
-{:
-    ArrayList<Expresion> lista = r1;
-    ArrayList<String> listaStrings = new ArrayList<String>();
-
-    listaStrings.add(r2);
-    listaStrings.add(r3);
-
-    lista.add(new Expresion(listaStrings));
-    RESULT = lista;
-:}
-| Numero:r
+| Caracter:r
 {:
     ArrayList<Expresion> lista = new ArrayList<Expresion>();
     ArrayList<String> listaStrings = new ArrayList<String>();
@@ -217,6 +178,7 @@ REGEXS ::= REGEXS:pluralR REGEX:singleR
     lista.add((Expresion)singleR);
     RESULT = lista;
 :}
+| error P_coma
 ;
 
 REGEX ::= Mas:r REGEX:r2 
@@ -269,7 +231,7 @@ REGEX ::= Mas:r REGEX:r2
     Expresion e = new Expresion(lista);
     RESULT = e;
 :}
-| Cadena:r
+| Caracter:r
 {:
     ArrayList<String> lista = new ArrayList<String>();
     lista.add(r);
@@ -320,7 +282,7 @@ SENTENCIAS ::= SENTENCIAS:pluralS SENTENCIA:singleS
 :}
 | error P_coma
 ;
-SENTENCIA ::= Id:idSen D_puntos Cadena:C P_coma 
+SENTENCIA ::= Id:idSen D_puntos Caracter:C P_coma 
 {:
     Sentencia s = new Sentencia(idSen, C);
     RESULT = s;

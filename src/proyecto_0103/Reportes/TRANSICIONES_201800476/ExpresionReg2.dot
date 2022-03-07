@@ -1,0 +1,13 @@
+digraph {
+  node [ shape=none fontname=Helvetica ]
+  n [ label = <
+    <table bgcolor="black"><tr>
+<td bgcolor="#ccccff" rowspan="2">Estados</td>
+<td bgcolor="#ccccff" colspan="3">Transiciones</td>
+</tr><tr>
+<td bgcolor="#ffcccc">{digito}</td>
+<td bgcolor="#ffcccc">"."</td>
+<td bgcolor="#ffcccc">#</td>
+</tr><tr><td bgcolor="#ccffcc">S1 {1}</td><td bgcolor="#ffffcc">S2</td><td bgcolor="#ffffcc"> --- </td><td bgcolor="#ffffcc"> --- </td></tr><tr><td bgcolor="#ccffcc">S2 {2}</td><td bgcolor="#ffffcc"> --- </td><td bgcolor="#ffffcc">S3</td><td bgcolor="#ffffcc"> --- </td></tr><tr><td bgcolor="#ccffcc">S3 {3}</td><td bgcolor="#ffffcc">S4</td><td bgcolor="#ffffcc"> --- </td><td bgcolor="#ffffcc"> --- </td></tr><tr><td bgcolor="#ccffcc">S4 {3,4}</td><td bgcolor="#ffffcc">S4</td><td bgcolor="#ffffcc"> --- </td><td bgcolor="#ffffcc"> --- </td></tr></table>
+  > ]
+label = "ExpresionReg2";}

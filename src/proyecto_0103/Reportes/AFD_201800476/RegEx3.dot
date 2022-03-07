@@ -1,0 +1,12 @@
+digraph finite_state_machine {
+	fontname="Helvetica,Arial,sans-serif"
+	node [fontname="Helvetica,Arial,sans-serif"]
+	edge [fontname="Helvetica,Arial,sans-serif"]
+	rankdir=LR;node [shape = doublecircle color=darkgreen]; S2;
+node [shape = circle color=blue];
+S1 -> S2 [label = "{digito}"];
+S2 -> S2 [label = "\"_\""];
+S2 -> S2 [label = "{letra}"];
+S2 -> S2 [label = "{digito}"];
+label = "RegEx3";
+}

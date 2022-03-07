@@ -20,6 +20,7 @@ public class AutomataGenerator {
     public static ArrayList<jsonData> jsonElements = new ArrayList<jsonData>();
     ArrayList<InsideTableNode> siguientes;
     ArrayList<TransNode> GeneralStates;
+    static int upgrade = 0;
 
     public void generateTree(String id) {
         String gText = "digraph G {";
@@ -395,11 +396,11 @@ public class AutomataGenerator {
                     + "<td bgcolor=\"#ccffcc\">S" + GeneralStates.get(i).id + " {";
             for (int j = 0; j < GeneralStates.get(i).numbers.size(); j++) {
                 if (j + 1 == GeneralStates.get(i).numbers.size()) {
-                    gText += GeneralStates.get(i).numbers.get(j).number;
+                    gText += GeneralStates.get(i).numbers.get(j).number + "(" + GeneralStates.get(i).numbers.get(j).name + ")";
                     //System.out.print(GeneralStates.get(i).numbers.get(j).number + " " + GeneralStates.get(i).numbers.get(j).scanned);
                     break;
                 }
-                gText += GeneralStates.get(i).numbers.get(j).number + ",";
+                gText += GeneralStates.get(i).numbers.get(j).number + "(" + GeneralStates.get(i).numbers.get(j).name + "),";
                 //System.out.print(GeneralStates.get(i).numbers.get(j).number + " " + GeneralStates.get(i).numbers.get(j).scanned);
             }
             gText += "}</td>";
@@ -421,14 +422,14 @@ public class AutomataGenerator {
             for (int j = 0; j < GeneralStates.get(i).numbers.size(); j++) {
                 if ("#".equals(GeneralStates.get(i).numbers.get(j).name)) {
                     if (j + 1 == GeneralStates.get(i).numbers.size()) {
-                        aStates += "S" + GeneralStates.get(i).id;
+                        aStates += "S" + GeneralStates.get(i).id + ";";
                     } else {
-                        aStates += "S" + GeneralStates.get(i).id + ", ";
+                        aStates += "S" + GeneralStates.get(i).id + ";";
                     }
                 }
             }
         }
-        gText2 += "node [shape = doublecircle color=green]; " + aStates + ";\n";
+        gText2 += "node [shape = doublecircle color=green]; " + aStates + "\n";
         gText2 += "node [shape = circle color=blue];\n";
         for (int i = 0; i < GeneralStates.size(); i++) {
             for (int j = 0; j < GeneralStates.get(i).transitions.size(); j++) {
@@ -485,46 +486,50 @@ public class AutomataGenerator {
         int currentState = 1;
         boolean Error = false;
         for (int i = 0; i < lexema.length; i++) {
+            upgrade = i;
             //System.out.println("Se encuentra en el estado " + currentState);
             String temp = lexema[i];
-            int lexCont = 0;
+            //System.out.println("temp: " + temp);
             if ("\\".equals(temp)) {
-                if ("\\\"".equals(temp + lexema[i + 1]) || "\\\'".equals(temp + lexema[i + 1])) {
-                    for (int j = i + 1; j < lexema.length; j++) {
+                if ("\\\"".equals(temp + lexema[i + 1])) {
+                    temp += "\"";
+                } else if ("\\\'".equals(temp + lexema[i + 1])) {
+                    temp += "\'";
+                } /*for (int j = i + 1; j < lexema.length; j++) {
                         if ("\\\"".equals(lexema[j] + lexema[j + 1]) || "\\\'".equals(lexema[j] + lexema[j + 1])) {
                             temp += lexema[j] + lexema[j + 1];
                             break;
                         }
                         temp += lexema[j];
                         lexCont += 1;
-                    }
-                } else if ("\\n".equals(temp + lexema[i + 1])) {
+                    }*/ else if ("\\n".equals(temp + lexema[i + 1])) {
                     temp += "n";
-                    lexCont += 1;
                 }
             }
+            //System.out.println("temp: " + temp);
             if (currentState == 1) {
                 boolean Accepted = false;
                 for (int j = 0; j < GeneralStates.get(currentState - 1).transitions.size(); j++) {
                     String[] t = temp.split("");
                     if (t.length >= 2) {
-                        if (transitionConversor(GeneralStates.get(currentState - 1).transitions.get(j).name, temp)) {
+                        if (transitionConversor(GeneralStates.get(currentState - 1).transitions.get(j).name, temp, lexema, i)) {
                             if (GeneralStates.get(currentState - 1).transitions.get(j).where != 0) {
                                 //System.out.println("Entrada: " + temp + " aceptada");
                                 Accepted = true;
                                 currentState = GeneralStates.get(currentState - 1).transitions.get(j).where;
-                                i += lexCont + 2;
+                                i = upgrade + 1;
                                 break;
                             } else {
                                 Error = true;
                             }
                         }
                     } else {
-                        if (transitionConversor(GeneralStates.get(currentState - 1).transitions.get(j).name, temp)) {
+                        if (transitionConversor(GeneralStates.get(currentState - 1).transitions.get(j).name, temp, lexema, i)) {
                             if (GeneralStates.get(currentState - 1).transitions.get(j).where != 0) {
                                 Accepted = true;
                                 //System.out.println("Caracter: " + temp + " aceptado");
                                 currentState = GeneralStates.get(currentState - 1).transitions.get(j).where;
+                                i = upgrade;
                                 break;
                             } else {
                                 Error = true;
@@ -548,23 +553,24 @@ public class AutomataGenerator {
                         for (int k = 0; k < GeneralStates.get(currentState - 1).transitions.size(); k++) {
                             String[] t = temp.split("");
                             if (t.length >= 2) {
-                                if (transitionConversor(GeneralStates.get(currentState - 1).transitions.get(k).name, temp)) {
+                                if (transitionConversor(GeneralStates.get(currentState - 1).transitions.get(k).name, temp, lexema, i)) {
                                     if (GeneralStates.get(currentState - 1).transitions.get(k).where != 0) {
                                         //System.out.println("Entrada: " + temp + " aceptada");
                                         Accepted = true;
                                         Accept = true;
                                         currentState = GeneralStates.get(currentState - 1).transitions.get(k).where;
-                                        i += lexCont + 2;
+                                        i = upgrade + 1;
                                         break;
                                     } else {
                                         Error = true;
                                     }
                                 }
                             } else {
-                                if (transitionConversor(GeneralStates.get(currentState - 1).transitions.get(k).name, temp)) {
+                                if (transitionConversor(GeneralStates.get(currentState - 1).transitions.get(k).name, temp, lexema, i)) {
                                     if (GeneralStates.get(currentState - 1).transitions.get(k).where != 0) {
                                         Accepted = true;
                                         Accept = true;
+                                        i = upgrade;
                                         //System.out.println("Caracter: " + temp + " aceptado");
                                         currentState = GeneralStates.get(currentState - 1).transitions.get(k).where;
                                         break;
@@ -590,12 +596,25 @@ public class AutomataGenerator {
             System.out.println("Lexema no aceptado por la Expresión regular");
             jsonElements.add(new jsonData(text, id, false));
         } else {
-            System.out.println("Lexema aceptado por la Expresión regular");
-            jsonElements.add(new jsonData(text, id, true));
+            boolean Nice = false;
+            for (int j = 0; j < GeneralStates.get(currentState - 1).numbers.size(); j++) {
+                if (GeneralStates.get(currentState - 1).numbers.get(j).name.equals("#")) {
+                    Nice = true;
+                    break;
+                }
+            }
+            if (Nice) {
+                System.out.println("Lexema aceptado por la Expresión regular");
+                jsonElements.add(new jsonData(text, id, true));
+            } else {
+                System.out.println("Lexema no aceptado por la Expresión regular");
+                jsonElements.add(new jsonData(text, id, false));
+            }
         }
     }
 
-    public static boolean transitionConversor(String conj, String caracter) {
+    public static boolean transitionConversor(String conj, String caracter, String[] complete, int index) {
+        //System.out.println("conj: " + conj + ", caracter: " + caracter);
         ArrayList<Instrucciones> ins = Analyzers.instrucciones;
         String[] c0 = conj.split("");
         if (c0[0].equals("\"") || c0[0].equals("\'")) {
@@ -605,26 +624,23 @@ public class AutomataGenerator {
             for (int i = 0; i < s3.length; i++) {
                 x += s3[i];
             }
-            return x.equals(caracter);
-            /*else {
-            String[] c = conj.split("");
-            if ("\"".equals(c[0]) || "\'".equals(c[0])) {
-                String[] f = removeTheElement(c, 0);
-                String[] f2 = removeTheElement(f, f.length - 1);
-                if ("\\".equals(f2[0])) {
-                    if ((f2[0] + f2[1]).equals(caracter)) {
-                        return true;
-                    } else {
-                        return false;
+            //System.out.println("x: " + x+", caracter: " + caracter + ", equals=? " + x.equals(caracter));
+            if (x.equals(caracter)) {
+                upgrade = index;
+                return x.equals(caracter);
+            } else {
+                String test = "";
+                for (int i = index; i < complete.length; i++) {
+                    test += complete[i];
+                    if (x.equals(test)) {
+                        upgrade = i;
+                        return x.equals(test);
                     }
-                } else {
-                    if (caracter.equals(f2[0])) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }*/
+                }
+                return false;
+            }
         } else {
+
             for (int i = 0; i < ins.size(); i++) {
                 switch (ins.get(i).getTipo()) {
                     case CONJUNTO:
@@ -636,16 +652,19 @@ public class AutomataGenerator {
                             conjunto += a3[m];
                         }
                         if (conjunto.equals(ins.get(i).id)) {
-                            for (int j = 0; j < ins.get(i).cadena.size(); j++) {
-                                if (ins.get(i).cadena.get(j).getListaInst().size() == 3) {
-                                    if (",".equals(ins.get(i).cadena.get(j).getListaInst().get(1))) {
+                            boolean Found = false;
+                            for (int j = 0; j < ins.get(i).getCadena().size(); j++) {
+                                String range = ins.get(i).getCadena().get(j).getListaInst().get(0).replaceAll("\\s", "");
+                                String[] sign = range.split("");
+                                if (ins.get(i).getCadena().get(j).getListaInst().size() == 3) {
+                                    if (",".equals(ins.get(i).getCadena().get(j).getListaInst().get(1))) {
                                         char character1 = caracter.charAt(0);
                                         int character = (int) character1;
 
-                                        char character2 = ins.get(i).cadena.get(j).getListaInst().get(0).charAt(0);
+                                        char character2 = ins.get(i).getCadena().get(j).getListaInst().get(0).charAt(0);
                                         int limit = (int) character2;
 
-                                        char character3 = ins.get(i).cadena.get(j).getListaInst().get(2).charAt(0);
+                                        char character3 = ins.get(i).getCadena().get(j).getListaInst().get(2).charAt(0);
                                         int limit2 = (int) character3;
                                         if (character == limit || character == limit2) {
                                             return true;
@@ -656,10 +675,40 @@ public class AutomataGenerator {
                                         char character1 = caracter.charAt(0);
                                         int character = (int) character1;
 
-                                        char character2 = ins.get(i).cadena.get(j).getListaInst().get(0).charAt(0);
+                                        char character2 = ins.get(i).getCadena().get(j).getListaInst().get(0).charAt(0);
                                         int limit = (int) character2;
 
-                                        char character3 = ins.get(i).cadena.get(j).getListaInst().get(2).charAt(0);
+                                        char character3 = ins.get(i).getCadena().get(j).getListaInst().get(2).charAt(0);
+                                        int limit2 = (int) character3;
+                                        if (character >= limit && character <= limit2) {
+                                            return true;
+                                        } else {
+                                            return false;
+                                        }
+                                    }
+                                } else if (sign.length == 3) {
+                                    if (sign[1].equals(",")) {
+                                        char character1 = caracter.charAt(0);
+                                        int character = (int) character1;
+
+                                        char character2 = sign[0].charAt(0);
+                                        int limit = (int) character2;
+
+                                        char character3 = sign[2].charAt(0);
+                                        int limit2 = (int) character3;
+                                        if (character == limit || character == limit2) {
+                                            return true;
+                                        } else {
+                                            return false;
+                                        }
+                                    } else {
+                                        char character1 = caracter.charAt(0);
+                                        int character = (int) character1;
+
+                                        char character2 = sign[0].charAt(0);
+                                        int limit = (int) character2;
+
+                                        char character3 = sign[2].charAt(0);
                                         int limit2 = (int) character3;
                                         if (character >= limit && character <= limit2) {
                                             return true;
@@ -668,18 +717,19 @@ public class AutomataGenerator {
                                         }
                                     }
                                 } else {
-                                    boolean Found = false;
-                                    for (int k = 0; k < ins.get(i).cadena.get(j).getListaInst().size(); k += 2) {
-                                        if (ins.get(i).cadena.get(j).getListaInst().get(k).equals(caracter)) {
+                                    for (int k = 0; k < ins.get(i).getCadena().get(j).getListaInst().size(); k++) {
+                                        if (ins.get(i).getCadena().get(j).getListaInst().get(k).equals(caracter)) {
                                             Found = true;
+                                            break;
                                         }
                                     }
-                                    if (Found) {
-                                        return true;
-                                    } else {
-                                        return false;
-                                    }
+
                                 }
+                            }
+                            if (Found) {
+                                return true;
+                            } else {
+                                return false;
                             }
                         }
                 }
@@ -932,4 +982,15 @@ public class AutomataGenerator {
         bw.close();
     }
 
+    public static String consolePrintResult() {
+        String result = "";
+        for (int i = 0; i < jsonElements.size(); i++) {
+            if (jsonElements.get(i).result) {
+                result += "La expresión: " + jsonElements.get(i).value + " es válida con la expresión regular " + jsonElements.get(i).regex + "\n";
+            } else {
+                result += "La expresión: " + jsonElements.get(i).value + " no es válida con la expresión regular " + jsonElements.get(i).regex + "\n";
+            }
+        }
+        return result;
+    }
 }

@@ -12,8 +12,8 @@ public class Fail {
     public String value = "";
 
     public Fail(int line, int column, String type, String message, String value) {
-        this.line = line+1;
-        this.column = column+1;
+        this.line = line;
+        this.column = column;
         this.type = type;
         this.message = message;
         this.value = value;

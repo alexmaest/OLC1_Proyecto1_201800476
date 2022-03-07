@@ -1,0 +1,30 @@
+digraph {
+  node [ shape=none fontname=Helvetica ]
+  n [ label = <
+    <table bgcolor="black"><tr>
+         <td bgcolor="#ccccff">No.</td>
+         <td bgcolor="#ccccff">Valor</td>
+         <td bgcolor="#ccccff">Siguientes</td>
+       </tr><tr>
+         <td bgcolor="#ccffcc">2</td>
+         <td bgcolor="#ffffcc">"_"</td>
+         <td bgcolor="#ffcccc">2, 3, 4</td>
+      </tr><tr>
+         <td bgcolor="#ccffcc">3</td>
+         <td bgcolor="#ffffcc">{letra}</td>
+         <td bgcolor="#ffcccc">2, 3, 4</td>
+      </tr><tr>
+         <td bgcolor="#ccffcc">4</td>
+         <td bgcolor="#ffffcc">{digito}</td>
+         <td bgcolor="#ffcccc">2, 3, 4</td>
+      </tr><tr>
+         <td bgcolor="#ccffcc">1</td>
+         <td bgcolor="#ffffcc">{digito}</td>
+         <td bgcolor="#ffcccc">2, 3, 4</td>
+      </tr><tr>
+         <td bgcolor="#ccffcc">5</td>
+         <td bgcolor="#ffffcc">#</td>
+         <td bgcolor="#ffcccc">---</td>
+      </tr></table>
+  > ]
+label = "RegEx3";}

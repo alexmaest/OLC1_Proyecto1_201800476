@@ -1,5 +1,8 @@
 package proyecto_0103;
 
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
+
 /**
  *
  * @author Alexis
@@ -11,15 +14,26 @@ public class Main {
      */
     public static void main(String[] args) throws Exception {
 
-        String ruta = "src/proyecto_0103/ThompsonTree/";
+        try {
+            for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception e) {
+        }
+        Screen s = new Screen();
+        s.setVisible(true);
+        /*String ruta = "src/proyecto_0103/";
 
         //Analizador Léxico
-        //String[] aLexico = {ruta + "Lexer3.flex", "-d", ruta};
-        //jflex.Main.generate(aLexico);
+        String[] aLexico = {ruta + "Lexer.flex", "-d", ruta};
+        jflex.Main.generate(aLexico);
 
         //Analizador Sintáctico
-        String[] aSintactico = {"-destdir", ruta, "-parser", "Automata2", ruta + "Automata2.cup"};
-        java_cup.Main.main(aSintactico);
+        String[] aSintactico = {"-destdir", ruta, "-parser", "Syntax", ruta + "Syntax.cup"};
+        java_cup.Main.main(aSintactico);*/
     }
 
 }

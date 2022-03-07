@@ -42,32 +42,45 @@ public class Analyzers {
             String syntaxError = s.getSyntaxError();
 
             if ("".equals(lexicError) && "".equals(syntaxError)) {
-                System.out.println("Analisis finalizado sin errores mi pai");
+                System.out.println("Analisis finalizado sin errores");
                 System.out.println("\n");
-                System.out.println("----------- SENTENCIAS -----------");
-                for (int i = 0; i < sentencias.size(); i++) {
+                //System.out.println("----------- SENTENCIAS -----------");
+                /*for (int i = 0; i < sentencias.size(); i++) {
                     System.out.println(sentencias.get(i).getId() + ", " + sentencias.get(i).getCadena());
-                }
+                }*/
 
-                System.out.println("----------- INSTRUCCIONES -----------");
-                System.out.println(instrucciones.size());
+                //System.out.println("----------- INSTRUCCIONES -----------");
+                //System.out.println(instrucciones.size());
                 arrayReg = new ArrayList<InsideTableNode>();
                 for (int i = 0; i < instrucciones.size(); i++) {
                     ArrayList<String> sTemp = new ArrayList<String>();
                     switch (instrucciones.get(i).getTipo()) {
                         case REGEX:
-                            System.out.println("***********************************");
-                            System.out.println(instrucciones.get(i).getId());
+                            //System.out.println("**********regex****************");
+                            //System.out.println(instrucciones.get(i).getId());
                             for (int j = 0; j < instrucciones.get(i).getCadena().size(); j++) {
                                 String singleRegex = "";
                                 for (int k = 0; k < instrucciones.get(i).getCadena().get(j).getListaInst().size(); k++) {
                                     singleRegex += instrucciones.get(i).getCadena().get(j).getListaInst().get(k);
-                                    System.out.print(instrucciones.get(i).getCadena().get(j).getListaInst().get(k));
+                                    //System.out.print(instrucciones.get(i).getCadena().get(j).getListaInst().get(k));
                                 }
-                                System.out.println("");
+                                //System.out.println("");
                                 sTemp.add(singleRegex);
                             }
                             arrayReg.add(new InsideTableNode(instrucciones.get(i).getId(), 0, sTemp));
+                        case CONJUNTO:
+                            //System.out.println("***********conjunto************");
+                            //System.out.println(instrucciones.get(i).getId());
+                            for (int j = 0; j < instrucciones.get(i).getCadena().size(); j++) {
+                                String singleRegex = "";
+                                for (int k = 0; k < instrucciones.get(i).getCadena().get(j).getListaInst().size(); k++) {
+                                    singleRegex += instrucciones.get(i).getCadena().get(j).getListaInst().get(k);
+                                    //System.out.print(instrucciones.get(i).getCadena().get(j).getListaInst().get(k) + "<--");
+                                }
+                                //System.out.println("");
+                                sTemp.add(singleRegex);
+                            }
+                            
                     }
                 }
 
@@ -75,7 +88,7 @@ public class Analyzers {
                 //v.validations();
                 return true;
             } else {
-                System.out.println("Analisis finalizado con errores mi pai");
+                System.out.println("Analisis finalizado con errores");
                 System.out.println("\n");
                 if (!"".equals(lexicError)) {
                     error += lexicError + "\n";

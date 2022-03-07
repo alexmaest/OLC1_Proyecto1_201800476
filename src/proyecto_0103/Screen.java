@@ -18,6 +18,7 @@ import java.awt.Image;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import java_cup.runtime.Scanner;
 import java_cup.runtime.Symbol;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -46,6 +48,9 @@ import proyecto_0103.ThompsonTree.DataText;
 public class Screen extends javax.swing.JFrame {
 
     Analyzers a;
+    int docCounter = 1;
+    int currentFile = 0;
+    boolean createNew = false;
 
     /**
      * Creates new form Screen
@@ -85,7 +90,10 @@ public class Screen extends javax.swing.JFrame {
         ImageLabel = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
+        jMenuItem6 = new javax.swing.JMenuItem();
         jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem7 = new javax.swing.JMenuItem();
+        jMenuItem8 = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
         jMenuItem5 = new javax.swing.JMenuItem();
@@ -136,7 +144,7 @@ public class Screen extends javax.swing.JFrame {
         TA2.setRows(5);
         jScrollPane2.setViewportView(TA2);
 
-        jButton1.setBackground(new java.awt.Color(255, 102, 0));
+        jButton1.setBackground(new java.awt.Color(255, 51, 0));
         jButton1.setForeground(new java.awt.Color(255, 255, 255));
         jButton1.setText("Analizar");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -285,6 +293,15 @@ public class Screen extends javax.swing.JFrame {
         jMenu1.setForeground(new java.awt.Color(0, 0, 0));
         jMenu1.setText("Archivo");
 
+        jMenuItem6.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.CTRL_MASK));
+        jMenuItem6.setText("Nuevo");
+        jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem6ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem6);
+
         jMenuItem1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
         jMenuItem1.setText("Abrir");
         jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
@@ -293,6 +310,24 @@ public class Screen extends javax.swing.JFrame {
             }
         });
         jMenu1.add(jMenuItem1);
+
+        jMenuItem7.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
+        jMenuItem7.setText("Guardar");
+        jMenuItem7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem7ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem7);
+
+        jMenuItem8.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.CTRL_MASK));
+        jMenuItem8.setText("Guardar como...");
+        jMenuItem8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem8ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem8);
 
         jMenuBar1.add(jMenu1);
 
@@ -467,6 +502,7 @@ public class Screen extends javax.swing.JFrame {
         ArrayList<InsideTableNode> ST = a.arrayReg;
         //Instancia para todo el proceso de un automata
         AutomataGenerator g = new AutomataGenerator();
+        g.jsonElements = new ArrayList<jsonData>();
         boolean analized = false;
         for (int i = 0; i < ST.size(); i++) {
             //Reiniciar variables
@@ -497,7 +533,7 @@ public class Screen extends javax.swing.JFrame {
         }
 
         if (analized) {
-            TA2.setText("Analisis de automatas realizado correctamente");
+            TA2.setText(g.consolePrintResult());
             TA2.setForeground(new Color(0, 255, 0));
         } else {
             TA2.setText("No se ha podido realizar el análisis de los automatas");
@@ -511,6 +547,7 @@ public class Screen extends javax.swing.JFrame {
         ArrayList<InsideTableNode> ST = a.arrayReg;
         //Instancia para todo el proceso de un automata
         AutomataGenerator2 g = new AutomataGenerator2();
+        g.jsonElements = new ArrayList<jsonData>();
         boolean analized = false;
         for (int i = 0; i < ST.size(); i++) {
             //Reiniciar variables
@@ -535,13 +572,107 @@ public class Screen extends javax.swing.JFrame {
             }
         }
         if (analized) {
-            TA2.setText("Analisis de automatas realizado correctamente");
+            TA2.setText(g.consolePrintResult());
             TA2.setForeground(new Color(0, 255, 0));
         } else {
             TA2.setText("No se ha podido realizar el análisis de los automatas");
             TA2.setForeground(new Color(255, 0, 0));
         }
     }//GEN-LAST:event_jMenuItem5ActionPerformed
+
+    private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
+        // TODO add your handling code here:
+        if (!createNew) {
+            FileWriter f = null;
+            PrintWriter textG = null;
+            try {
+                TA1.setText("");
+                String cType = "";
+                File directory;
+                cType = "Archivo" + docCounter + ".exp";
+                currentFile = docCounter;
+                docCounter += 1;
+                f = new FileWriter(cType);
+                textG = new PrintWriter(f);
+                textG.write("");
+                textG.close();
+                f.close();
+                JOptionPane.showMessageDialog(this, "Mensaje: Nuevo archivo creado");
+                createNew = true;
+            } catch (Exception e) {
+                System.out.println(e);
+            } finally {
+                if (textG != null) {
+                    textG.close();
+                    try {
+                        f.close();
+                    } catch (IOException ex) {
+                    }
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Mensaje: Guarde su información antes de crear un nuevo archivo");
+        }
+
+    }//GEN-LAST:event_jMenuItem6ActionPerformed
+
+    private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
+        // TODO add your handling code here:
+        FileWriter f = null;
+        PrintWriter textG = null;
+        try {
+            String cType = TA1.getText();
+            String cType2 = "Archivo" + currentFile + ".exp";
+            f = new FileWriter(cType2);
+            textG = new PrintWriter(f);
+            textG.write(cType);
+            textG.close();
+            f.close();
+            JOptionPane.showMessageDialog(this, "Mensaje: Información guardada");
+            createNew = false;
+        } catch (Exception e) {
+            System.out.println(e);
+        } finally {
+            if (textG != null) {
+                textG.close();
+                try {
+                    f.close();
+                } catch (IOException ex) {
+                }
+            }
+        }
+    }//GEN-LAST:event_jMenuItem7ActionPerformed
+
+    private void jMenuItem8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem8ActionPerformed
+        // TODO add your handling code here:
+        String name = JOptionPane.showInputDialog("Ingrese el nombre para el archivo:");
+        File file = new File("Archivo" + currentFile + ".exp");
+        File file2 = new File(name + ".exp");
+
+        if (file2.exists()) {
+        }
+        boolean success = file.renameTo(file2);
+
+        if (success) {
+            FileWriter f = null;
+            PrintWriter textG = null;
+            try {
+                f = new FileWriter(file2);
+            } catch (IOException ex) {
+                Logger.getLogger(Screen.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            textG = new PrintWriter(f);
+            textG.write(TA1.getText());
+            textG.close();
+            try {
+                f.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Screen.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            JOptionPane.showMessageDialog(this, "Mensaje: Información guardada");
+            createNew = false;
+        }
+    }//GEN-LAST:event_jMenuItem8ActionPerformed
     public static DefaultMutableTreeNode root;
     public static DefaultTreeModel model;
 
@@ -642,6 +773,9 @@ public class Screen extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
+    private javax.swing.JMenuItem jMenuItem6;
+    private javax.swing.JMenuItem jMenuItem7;
+    private javax.swing.JMenuItem jMenuItem8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;

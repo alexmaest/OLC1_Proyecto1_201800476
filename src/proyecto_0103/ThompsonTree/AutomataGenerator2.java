@@ -2,10 +2,10 @@ package proyecto_0103.ThompsonTree;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import proyecto_0103.Analyzers;
 import static proyecto_0103.ExpressionTree.AutomataGenerator.imageGenerator;
-import static proyecto_0103.ExpressionTree.AutomataGenerator.jsonElements;
 import static proyecto_0103.ExpressionTree.AutomataGenerator.removeTheElement;
-import static proyecto_0103.ExpressionTree.AutomataGenerator.transitionConversor;
+import proyecto_0103.Instrucciones;
 import proyecto_0103.jsonData;
 
 /**
@@ -14,10 +14,12 @@ import proyecto_0103.jsonData;
  */
 public class AutomataGenerator2 {
 
+    public static ArrayList<jsonData> jsonElements = new ArrayList<jsonData>();
     ArrayList<DataText> conexiones;
     ArrayList<Node> nodos2;
     ArrayList<TransNode3> transiciones;
     int max = 0;
+    static int upgrade2 = 0;
 
     public void generateTree(String id) {
         transiciones = new ArrayList<TransNode3>();
@@ -432,54 +434,60 @@ public class AutomataGenerator2 {
         TransNode3 firstTransition = transiciones.get(0);
         ArrayList<Integer> first = transiciones.get(0).idNumbers;
         ArrayList<Integer> currentState = transiciones.get(0).idNumbers;
-        for (int i = 0; i < transiciones.get(0).idNumbers.size(); i++) {
-            System.out.println("... " + transiciones.get(0).idNumbers.get(i));
-        }
+        ArrayList<Node> currentNodes = transiciones.get(0).numbers;
         boolean Error = false;
         for (int i = 0; i < lexema.length; i++) {
+            upgrade2 = i;
             //System.out.println("Se encuentra en el estado " + currentState);
             String temp = lexema[i];
-            System.out.println("temp = " + temp);
-            int lexCont = 0;
             if ("\\".equals(temp)) {
-                System.out.println("Entra1");
-                if ("\\\"".equals(temp + lexema[i + 1]) || "\\\'".equals(temp + lexema[i + 1])) {
-                    System.out.println("Entra2");
-                    for (int j = i + 1; j < lexema.length; j++) {
+                if ("\\\"".equals(temp + lexema[i + 1])) {
+                    temp += "\"";
+                } else if ("\\\'".equals(temp + lexema[i + 1])) {
+                    temp += "\'";
+                } /*for (int j = i + 1; j < lexema.length; j++) {
                         if ("\\\"".equals(lexema[j] + lexema[j + 1]) || "\\\'".equals(lexema[j] + lexema[j + 1])) {
                             temp += lexema[j] + lexema[j + 1];
                             break;
                         }
                         temp += lexema[j];
                         lexCont += 1;
-                    }
-                } else if ("\\n".equals(temp + lexema[i + 1])) {
+                    }*/ else if ("\\n".equals(temp + lexema[i + 1])) {
                     temp += "n";
-                    lexCont += 1;
                 }
             }
+            System.out.println("temp = " + temp);
             if (currentState.equals(first)) {
                 boolean Accepted = false;
+                boolean Accept = false;
                 for (int j = 0; j < firstTransition.getTransitions().size(); j++) {
+                    if (Accept) {
+                        break;
+                    }
                     String[] t = temp.split("");
                     if (t.length >= 2) {
-                        if (transitionConversor(firstTransition.getTransitions().get(j).name, temp)) {
+                        if (transitionConversor(firstTransition.getTransitions().get(j).name, temp, lexema, i)) {
                             if (!firstTransition.getTransitions().get(j).getWhere().isEmpty()) {
                                 //System.out.println("Entrada: " + temp + " aceptada");
                                 Accepted = true;
+                                Accept = true;
                                 currentState = firstTransition.getTransitions().get(j).getWhere();
-                                i += lexCont + 2;
+                                currentNodes = firstTransition.numbers;
+                                i = upgrade2 + 1;
                                 break;
                             } else {
                                 Error = true;
                             }
                         }
                     } else {
-                        if (transitionConversor(firstTransition.getTransitions().get(j).name, temp)) {
+                        if (transitionConversor(firstTransition.getTransitions().get(j).name, temp, lexema, i)) {
                             if (!firstTransition.getTransitions().get(j).getWhere().isEmpty()) {
                                 Accepted = true;
+                                Accept = true;
                                 //System.out.println("Caracter: " + temp + " aceptado");
                                 currentState = firstTransition.getTransitions().get(j).getWhere();
+                                currentNodes = firstTransition.numbers;
+                                i = upgrade2;
                                 break;
                             } else {
                                 Error = true;
@@ -503,25 +511,28 @@ public class AutomataGenerator2 {
                         for (int k = 0; k < transiciones.get(j).getTransitions().size(); k++) {
                             String[] t = temp.split("");
                             if (t.length >= 2) {
-                                if (transitionConversor(transiciones.get(j).getTransitions().get(k).name, temp)) {
+                                if (transitionConversor(transiciones.get(j).getTransitions().get(k).name, temp, lexema, i)) {
                                     if (!transiciones.get(j).getTransitions().get(k).getWhere().isEmpty()) {
                                         //System.out.println("Entrada: " + temp + " aceptada");
                                         Accepted = true;
                                         Accept = true;
                                         currentState = transiciones.get(j).getTransitions().get(k).getWhere();
-                                        i += lexCont + 2;
+                                        currentNodes = transiciones.get(j).numbers;
+                                        i = upgrade2 + 1;
                                         break;
                                     } else {
                                         Error = true;
                                     }
                                 }
                             } else {
-                                if (transitionConversor(transiciones.get(j).getTransitions().get(k).name, temp)) {
+                                if (transitionConversor(transiciones.get(j).getTransitions().get(k).name, temp, lexema, i)) {
                                     if (!transiciones.get(j).getTransitions().get(k).getWhere().isEmpty()) {
                                         Accepted = true;
                                         Accept = true;
                                         //System.out.println("Caracter: " + temp + " aceptado");
                                         currentState = transiciones.get(j).getTransitions().get(k).getWhere();
+                                        currentNodes = transiciones.get(j).numbers;
+                                        i = upgrade2;
                                         break;
                                     } else {
                                         Error = true;
@@ -545,9 +556,157 @@ public class AutomataGenerator2 {
             System.out.println("Lexema no aceptado por la Expresión regular");
             jsonElements.add(new jsonData(text, id, false));
         } else {
-            System.out.println("Lexema aceptado por la Expresión regular");
-            jsonElements.add(new jsonData(text, id, true));
+            boolean Nice = false;
+            for (int j = 0; j < currentNodes.size(); j++) {
+                if (currentNodes.get(j).state == max) {
+                    Nice = true;
+                    break;
+                }
+            }
+            if (Nice) {
+                System.out.println("Lexema aceptado por la Expresión regular");
+                jsonElements.add(new jsonData(text, id, true));
+            } else {
+                System.out.println("Lexema no aceptado por la Expresión regular");
+                jsonElements.add(new jsonData(text, id, false));
+            }
         }
     }
 
+    public static boolean transitionConversor(String conj, String caracter, String[] complete, int index) {
+        //System.out.println("conj: " + conj + ", caracter: " + caracter);
+        ArrayList<Instrucciones> ins = Analyzers.instrucciones;
+        String[] c0 = conj.split("");
+        if (c0[0].equals("\"") || c0[0].equals("\'")) {
+            String[] s2 = removeTheElement(c0, 0);
+            String[] s3 = removeTheElement(s2, s2.length - 1);
+            String x = "";
+            for (int i = 0; i < s3.length; i++) {
+                x += s3[i];
+            }
+            //System.out.println("x: " + x + ", caracter: " + caracter + ", equals=? " + x.equals(caracter));
+            if (x.equals(caracter)) {
+                upgrade2 = index;
+                return x.equals(caracter);
+            } else {
+                String test = "";
+                for (int i = index; i < complete.length; i++) {
+                    test += complete[i];
+                    if (x.equals(test)) {
+                        upgrade2 = i;
+                        return x.equals(test);
+                    }
+                }
+                return false;
+            }
+        } else {
+
+            for (int i = 0; i < ins.size(); i++) {
+                switch (ins.get(i).getTipo()) {
+                    case CONJUNTO:
+                        String[] a = conj.split("");
+                        String[] a2 = removeTheElement(a, 0);
+                        String[] a3 = removeTheElement(a2, a2.length - 1);
+                        String conjunto = "";
+                        for (int m = 0; m < a3.length; m++) {
+                            conjunto += a3[m];
+                        }
+                        if (conjunto.equals(ins.get(i).id)) {
+                            boolean Found = false;
+                            for (int j = 0; j < ins.get(i).getCadena().size(); j++) {
+                                String range = ins.get(i).getCadena().get(j).getListaInst().get(0).replaceAll("\\s", "");
+                                String[] sign = range.split("");
+                                if (ins.get(i).getCadena().get(j).getListaInst().size() == 3) {
+                                    if (",".equals(ins.get(i).getCadena().get(j).getListaInst().get(1))) {
+                                        char character1 = caracter.charAt(0);
+                                        int character = (int) character1;
+
+                                        char character2 = ins.get(i).getCadena().get(j).getListaInst().get(0).charAt(0);
+                                        int limit = (int) character2;
+
+                                        char character3 = ins.get(i).getCadena().get(j).getListaInst().get(2).charAt(0);
+                                        int limit2 = (int) character3;
+                                        if (character == limit || character == limit2) {
+                                            return true;
+                                        } else {
+                                            return false;
+                                        }
+                                    } else {
+                                        char character1 = caracter.charAt(0);
+                                        int character = (int) character1;
+
+                                        char character2 = ins.get(i).getCadena().get(j).getListaInst().get(0).charAt(0);
+                                        int limit = (int) character2;
+
+                                        char character3 = ins.get(i).getCadena().get(j).getListaInst().get(2).charAt(0);
+                                        int limit2 = (int) character3;
+                                        if (character >= limit && character <= limit2) {
+                                            return true;
+                                        } else {
+                                            return false;
+                                        }
+                                    }
+                                } else if (sign.length == 3) {
+                                    if (sign[1].equals(",")) {
+                                        char character1 = caracter.charAt(0);
+                                        int character = (int) character1;
+
+                                        char character2 = sign[0].charAt(0);
+                                        int limit = (int) character2;
+
+                                        char character3 = sign[2].charAt(0);
+                                        int limit2 = (int) character3;
+                                        if (character == limit || character == limit2) {
+                                            return true;
+                                        } else {
+                                            return false;
+                                        }
+                                    } else {
+                                        char character1 = caracter.charAt(0);
+                                        int character = (int) character1;
+
+                                        char character2 = sign[0].charAt(0);
+                                        int limit = (int) character2;
+
+                                        char character3 = sign[2].charAt(0);
+                                        int limit2 = (int) character3;
+                                        if (character >= limit && character <= limit2) {
+                                            return true;
+                                        } else {
+                                            return false;
+                                        }
+                                    }
+                                } else {
+                                    for (int k = 0; k < ins.get(i).getCadena().get(j).getListaInst().size(); k++) {
+                                        if (ins.get(i).getCadena().get(j).getListaInst().get(k).equals(caracter)) {
+                                            Found = true;
+                                            break;
+                                        }
+                                    }
+
+                                }
+                            }
+                            if (Found) {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        }
+                }
+            }
+        }
+        return false;
+    }
+
+    public static String consolePrintResult() {
+        String result = "";
+        for (int i = 0; i < jsonElements.size(); i++) {
+            if (jsonElements.get(i).result) {
+                result += "La expresión: " + jsonElements.get(i).value + " es válida con la expresión regular " + jsonElements.get(i).regex + "\n";
+            } else {
+                result += "La expresión: " + jsonElements.get(i).value + " no es válida con la expresión regular " + jsonElements.get(i).regex + "\n";
+            }
+        }
+        return result;
+    }
 }
